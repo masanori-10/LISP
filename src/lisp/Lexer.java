@@ -13,7 +13,7 @@ public class Lexer{
 		this.token = new Token[100];
 	}
 
-	public void lineToTokens(String inputLine) throws SyntaxException{
+	public void lexe(String inputLine) throws SyntaxException{
 		int lexemeBegin=0,forward=1;
 
 		while(inputLine.length() > forward){
@@ -22,7 +22,7 @@ public class Lexer{
 			if(m.find()){
 				throw new SyntaxException();
 			}
-			this.p = Pattern.compile("^\\s$");
+			this.p = Pattern.compile("^[\\s]$");
 			m = p.matcher(inputLine.substring(lexemeBegin,forward));
 			if(m.find()){
 				lexemeBegin++;
@@ -31,43 +31,50 @@ public class Lexer{
 			this.p = Pattern.compile("^[\\(\\)]$");
 			m = p.matcher(inputLine.substring(lexemeBegin,forward));
 			if(m.find()){
-				token[this.tokenNumber] = new Token("paren",inputLine.substring(lexemeBegin,forward),-1);
+				this.token[this.tokenNumber] = new Token("paren",inputLine.substring(lexemeBegin,forward),-1);
 				this.tokenNumber++;
 				lexemeBegin++;
 				forward++;
 			}
+			this.p = Pattern.compile("^(T|Nil)[^a-zA-Z0-9]$");
+			m = p.matcher(inputLine.substring(lexemeBegin,forward));
+			if(m.find()){
+				this.token[this.tokenNumber] = new Token("bool",inputLine.substring(lexemeBegin,forward-1));
+				this.tokenNumber++;
+				lexemeBegin = forward-1;
+			}
 			this.p = Pattern.compile("^setq[^a-zA-Z0-9]$");
 			m = p.matcher(inputLine.substring(lexemeBegin,forward));
 			if(m.find()){
-				token[this.tokenNumber] = new Token("command","setq",2);
+				this.token[this.tokenNumber] = new Token("command","setq",2);
 				this.tokenNumber++;
 				lexemeBegin = forward-1;
 			}
 			this.p = Pattern.compile("^(if|defun)[^a-zA-Z0-9]$");
 			m = p.matcher(inputLine.substring(lexemeBegin,forward));
 			if(m.find()){
-				token[this.tokenNumber] = new Token("command",inputLine.substring(lexemeBegin,forward-1),3);
+				this.token[this.tokenNumber] = new Token("command",inputLine.substring(lexemeBegin,forward-1),3);
 				this.tokenNumber++;
 				lexemeBegin = forward-1;
 			}
 			this.p = Pattern.compile("^[a-zA-Z][a-zA-Z0-9]*[^a-zA-Z0-9]$");
 			m = p.matcher(inputLine.substring(lexemeBegin,forward));
 			if(m.find()){
-				token[this.tokenNumber] = new Token("id",inputLine.substring(lexemeBegin,forward-1));
+				this.token[this.tokenNumber] = new Token("id",inputLine.substring(lexemeBegin,forward-1));
 				this.tokenNumber++;
 				lexemeBegin = forward - 1;
 			}
 			this.p = Pattern.compile("^-?[0-9]+(\\.[0-9]+)?(E[+\\-]?[0-9])?[^\\.E0-9]$");
 			m = p.matcher(inputLine.substring(lexemeBegin,forward));
 			if(m.find()){
-				token[this.tokenNumber] = new Token("number",Double.parseDouble(inputLine.substring(lexemeBegin,forward-1)));
+				this.token[this.tokenNumber] = new Token("number",Double.parseDouble(inputLine.substring(lexemeBegin,forward-1)));
 				this.tokenNumber++;
 				lexemeBegin = forward - 1;
 			}
 			this.p = Pattern.compile("^[\\+\\*\\/]$");
 			m = p.matcher(inputLine.substring(lexemeBegin,forward));
 			if(m.find()){
-				token[this.tokenNumber] = new Token("operator",inputLine.substring(lexemeBegin,forward),2);
+				this.token[this.tokenNumber] = new Token("operator",inputLine.substring(lexemeBegin,forward),2);
 				this.tokenNumber++;
 				lexemeBegin = forward;
 				forward++;
@@ -75,14 +82,14 @@ public class Lexer{
 			this.p = Pattern.compile("^-[^0-9]$");
 			m = p.matcher(inputLine.substring(lexemeBegin,forward));
 			if(m.find()){
-				token[this.tokenNumber] = new Token("operator",inputLine.substring(lexemeBegin,forward-1),2);
+				this.token[this.tokenNumber] = new Token("operator",inputLine.substring(lexemeBegin,forward-1),2);
 				this.tokenNumber++;
 				lexemeBegin = forward - 1;
 			}
 			this.p = Pattern.compile("^<=|>=|!=|=$");
 			m = p.matcher(inputLine.substring(lexemeBegin,forward));
 			if(m.find()){
-				token[this.tokenNumber] = new Token("comparator",inputLine.substring(lexemeBegin,forward),2);
+				this.token[this.tokenNumber] = new Token("comparator",inputLine.substring(lexemeBegin,forward),2);
 				this.tokenNumber++;
 				lexemeBegin = forward;
 				forward++;
@@ -90,7 +97,7 @@ public class Lexer{
 			this.p = Pattern.compile("^<[^=]|>[^=]$");
 			m = p.matcher(inputLine.substring(lexemeBegin,forward));
 			if(m.find()){
-				token[this.tokenNumber] = new Token("comparator",inputLine.substring(lexemeBegin,forward-1),2);
+				this.token[this.tokenNumber] = new Token("comparator",inputLine.substring(lexemeBegin,forward-1),2);
 				this.tokenNumber++;
 				lexemeBegin = forward - 1;
 			}
@@ -100,25 +107,13 @@ public class Lexer{
 				forward++;
 			}
 		}
-		adjustId();
-	}
-	public void adjustId(){
-		for(int i=0;i<this.tokenNumber;i++){
-			if(token[i].getAttribute().equals("id")){
-				for(int j=0;j<i;j++){
-					if(token[i].getName().equals(token[j].getName())){
-						token[i] = token[j];
-					}
-				}
-			}
-		}
 	}
 
 	public Token getToken(int i){
-		return token[i];
+		return this.token[i];
 	}
 	public Token[] getToken(){
-		return token;
+		return this.token;
 	}
 	public int getTokenNumber(){
 		return this.tokenNumber;

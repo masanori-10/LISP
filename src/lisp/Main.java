@@ -8,26 +8,13 @@ public class Main{
 		Reader reader = new Reader();
 		Lexer lexer = new Lexer();
 		Parser parser = new Parser();
-		Estimator estimator = new Estimator();
+		Eval eval = new Eval();
 
-		System.out.println("Please select the input method.(Dialog->0,file->1)");
 		try{
-			reader.readDialog();
-			lexer.lineToTokens(reader.getInputLine());
-
-			for(int i=0;i<lexer.getTokenNumber();i++){
-				System.out.println(lexer.getToken(i).getAttribute());
-				System.out.println(lexer.getToken(i).getName());
-				System.out.println(lexer.getToken(i).getValue());
-			}
-
-			parser.parser(lexer.getToken(),lexer.getTokenNumber());
-			estimator.estimator(parser.getCompleteTree(),parser.getCompleteNumber());
-
-			System.out.println(parser.getCompleteTree(0).getRootNode().getChild(1).getToken().getAttribute());
-			System.out.println(parser.getCompleteTree(0).getRootNode().getChild(1).getToken().getName());
-			System.out.println(parser.getCompleteTree(0).getRootNode().getChild(1).getToken().getValue());
-
+			reader.read();
+			lexer.lexe(reader.getInputLine());
+			parser.parse(lexer.getToken(),lexer.getTokenNumber());
+			eval.evaluate(parser.getCompleteTree(),parser.getCompleteNumber());
 		}catch(SyntaxException e){
 			System.out.println(e);
 		}catch(IOException e){

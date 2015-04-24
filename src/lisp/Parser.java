@@ -4,28 +4,28 @@ package lisp;
 public class Parser{
 	private TreeNode treeNode;
 	private TreeNode[] completeTree;
-	private int parenStack,completeNumber;
+	private int parenCount,completeNumber;
 	public Parser(){
 		this.treeNode = new TreeNode();
 		this.completeTree = new TreeNode[10];
-		this.parenStack = 0;
+		this.parenCount = 0;
 		this.completeNumber = 0;
 	}
 
-	public void parser(Token[] token,int tokenNumber) throws SyntaxException{
+	public void parse(Token[] token,int tokenNumber) throws SyntaxException{
 		for(int i=0;i<tokenNumber;i++){
 			switch (token[i].getAttribute()) {
 			case "paren":
 				if(token[i].getName().equals("(")){
-					if(parenStack != 0){
+					if(parenCount != 0){
 						this.treeNode.add(token[i]);
 					}
 					this.treeNode.open();
-					this.parenStack++;
+					this.parenCount++;
 				}else{
 					this.treeNode.close();
-					this.parenStack--;
-					if (parenStack == 0){
+					this.parenCount--;
+					if (parenCount == 0){
 						if(this.treeNode.getProcessedNode() != this.treeNode.getRootNode()){
 							throw new SyntaxException();
 						}
@@ -51,6 +51,7 @@ public class Parser{
 				break;
 			case "number":
 			case "id":
+			case "bool":
 				this.treeNode.add(token[i]);
 				while(this.treeNode.getParentNode().getToken() != null){
 					if(this.treeNode.getParentNode().getToken().getArgumentCounter() == 0){

@@ -21,6 +21,9 @@ public class Tree{
 	public Tree getChild(int i){
 		return this.child[i];
 	}
+	public void setToken(Token token){
+		this.token = token;
+	}
 	public void setParent(Tree parent){
 		this.parent = parent;
 	}

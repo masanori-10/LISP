@@ -4,6 +4,8 @@ public class Token{
 	private String attribute,name;
 	private int argumentCounter;
 	private double value;
+	public Token(){
+	}
 	public Token(String attribute){
 		this.attribute = attribute;
 	}
