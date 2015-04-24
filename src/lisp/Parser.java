@@ -1,42 +1,44 @@
 package lisp;
 
+import java.util.ArrayList;
 
-public class Parser{
+public class Parser {
 	private TreeNode treeNode;
-	private TreeNode[] completeTree;
-	private int parenCount,completeNumber;
-	public Parser(){
+	private int parenCount;
+
+	public Parser() {
 		this.treeNode = new TreeNode();
-		this.completeTree = new TreeNode[10];
 		this.parenCount = 0;
-		this.completeNumber = 0;
 	}
 
-	public void parse(Token[] token,int tokenNumber) throws SyntaxException{
-		for(int i=0;i<tokenNumber;i++){
-			switch (token[i].getAttribute()) {
-			case "paren":
-				if(token[i].getName().equals("(")){
-					if(parenCount != 0){
+	public void parse(ArrayList<Token> token) throws SyntaxException {
+		int processe = 0;
+		while (processe < token.size()) {
+			switch (token.get(processe).getAttribute()) {
+			case "group":
+				if (token.get(processe).getName().equals("(")) {
+					if (parenCount != 0) {
 						this.treeNode.add(token[i]);
 					}
 					this.treeNode.open();
 					this.parenCount++;
-				}else{
+				} else {
 					this.treeNode.close();
 					this.parenCount--;
-					if (parenCount == 0){
-						if(this.treeNode.getProcessedNode() != this.treeNode.getRootNode()){
+					if (parenCount == 0) {
+						if (this.treeNode.getProcessedNode() != this.treeNode
+								.getRootNode()) {
 							throw new SyntaxException();
 						}
 						this.completeTree[this.completeNumber] = this.treeNode;
 						this.treeNode = new TreeNode();
 						this.completeNumber++;
-					}else{
-						while(this.treeNode.getParentNode().getToken() != null){
-							if(this.treeNode.getParentNode().getToken().getArgumentCounter() == 0){
+					} else {
+						while (this.treeNode.getParentNode().getToken() != null) {
+							if (this.treeNode.getParentNode().getToken()
+									.getArgumentCounter() == 0) {
 								this.treeNode.close();
-							}else{
+							} else {
 								break;
 							}
 						}
@@ -46,32 +48,20 @@ public class Parser{
 			case "command":
 			case "operator":
 			case "comparator":
-				this.treeNode.add(token[i]);
-				this.treeNode.open();
+			case "defunedId":
+				this.treeNode.add(token.get(processe));
+				this.treeNode.moveToLastChild();
 				break;
 			case "number":
 			case "id":
 			case "bool":
-				this.treeNode.add(token[i]);
-				while(this.treeNode.getParentNode().getToken() != null){
-					if(this.treeNode.getParentNode().getToken().getArgumentCounter() == 0){
-						this.treeNode.close();
-					}else{
-						break;
-					}
-				}
+				this.treeNode.add(token.get(processe));
 				break;
 			}
 		}
 	}
 
-	public TreeNode getCompleteTree(int i){
-		return this.completeTree[i];
-	}
-	public TreeNode[] getCompleteTree(){
-		return this.completeTree;
-	}
-	public int getCompleteNumber(){
-		return this.completeNumber;
+	public TreeNode getTreeNode() {
+		return this.treeNode;
 	}
 }

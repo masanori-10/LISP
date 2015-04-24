@@ -1,49 +1,47 @@
 package lisp;
 
-public class Token{
-	private String attribute,name;
-	private int argumentCounter;
+public class Token {
+	private String attribute, name;
 	private double value;
-	public Token(){
+
+	public Token() {
 	}
-	public Token(String attribute){
+
+	public Token(String attribute) {
 		this.attribute = attribute;
 	}
-	public Token(String attribute,String name){
+
+	public Token(String attribute, String name) {
 		this(attribute);
 		this.name = name;
 	}
-	public Token(String attribute,double value){
+
+	public Token(String attribute, double value) {
 		this(attribute);
 		this.value = value;
 	}
-	public Token(String attribute,String name,int argumentCounter){
-		this(attribute, name);
-		this.argumentCounter = argumentCounter;
-	}
 
-	public String getAttribute(){
+	public String getAttribute() {
 		return this.attribute;
 	}
-	public String getName(){
+
+	public String getName() {
 		return this.name;
 	}
-	public int getArgumentCounter(){
-		return this.argumentCounter;
-	}
-	public double getValue(){
+
+	public double getValue() {
 		return this.value;
 	}
-	public void setAttribute(String attribute){
+
+	public void setAttribute(String attribute) {
 		this.attribute = attribute;
 	}
-	public void setName(String name){
+
+	public void setName(String name) {
 		this.name = name;
 	}
-	public void setArgumentCounter(int argumentCounter){
-		this.argumentCounter = argumentCounter;
-	}
-	public void setValue(double value){
+
+	public void setValue(double value) {
 		this.value = value;
 	}
 }
