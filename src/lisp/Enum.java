@@ -2,10 +2,10 @@ package lisp;
 
 public class Enum {
 	enum Attribute {
-		open, close, bool,
+		GROUP, BOOL, RESERVED, OPERATOR, COMPARATOR, FUNCTION, NUMBER, ID
 	}
 
-	enum name {
-
+	enum Name {
+		OPEN, CLOSE, SETQ, IF, DEFUN, PULS, MINUS, MULT, DIVIDE,
 	}
 }
