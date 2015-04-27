@@ -5,14 +5,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Lexer {
-	private ArrayList<Token> token;
+	private ArrayList<Node> token;
 	private boolean defunCheck;
 	private Pattern other, space, group, bool, command, id, number, operator1,
 			operator2, comparator1, comparator2, stock;
 	private Matcher m;
 
 	public Lexer() {
-		this.token = new ArrayList<Token>();
+		this.token = new ArrayList<Node>();
 		this.defunCheck = false;
 		this.other = Pattern
 				.compile("^[^\\s\\(\\)a-zA-Z0-9<>=!\\+\\-\\*\\/\\.]$");
@@ -46,20 +46,20 @@ public class Lexer {
 			}
 			m = group.matcher(inputLine.substring(lexemeBegin, forward));
 			if (m.find()) {
-				this.token.add(new Token("group", inputLine.substring(
+				this.token.add(new Node("group", inputLine.substring(
 						lexemeBegin, forward)));
 				lexemeBegin++;
 				forward++;
 			}
 			m = bool.matcher(inputLine.substring(lexemeBegin, forward));
 			if (m.find()) {
-				this.token.add(new Token("bool", inputLine.substring(
+				this.token.add(new Node("bool", inputLine.substring(
 						lexemeBegin, forward - 1)));
 				lexemeBegin = forward - 1;
 			}
 			m = command.matcher(inputLine.substring(lexemeBegin, forward));
 			if (m.find()) {
-				this.token.add(new Token("command", inputLine.substring(
+				this.token.add(new Node("command", inputLine.substring(
 						lexemeBegin, forward - 1)));
 				if (this.token.get(this.token.size() - 1).getName()
 						.equals("defun")) {
@@ -70,10 +70,10 @@ public class Lexer {
 			m = id.matcher(inputLine.substring(lexemeBegin, forward));
 			if (m.find()) {
 				if (this.defunCheck == false) {
-					this.token.add(new Token("id", inputLine.substring(
+					this.token.add(new Node("id", inputLine.substring(
 							lexemeBegin, forward - 1)));
 				} else {
-					this.token.add(new Token("defunedId", inputLine.substring(
+					this.token.add(new Node("defunedId", inputLine.substring(
 							lexemeBegin, forward - 1)));
 					this.defunCheck = false;
 				}
@@ -81,33 +81,33 @@ public class Lexer {
 			}
 			m = number.matcher(inputLine.substring(lexemeBegin, forward));
 			if (m.find()) {
-				this.token.add(new Token("number", Double.parseDouble(inputLine
+				this.token.add(new Node("number", Double.parseDouble(inputLine
 						.substring(lexemeBegin, forward - 1))));
 				lexemeBegin = forward - 1;
 			}
 			m = operator1.matcher(inputLine.substring(lexemeBegin, forward));
 			if (m.find()) {
-				this.token.add(new Token("operator", inputLine.substring(
+				this.token.add(new Node("operator", inputLine.substring(
 						lexemeBegin, forward)));
 				lexemeBegin = forward;
 				forward++;
 			}
 			m = operator2.matcher(inputLine.substring(lexemeBegin, forward));
 			if (m.find()) {
-				this.token.add(new Token("operator", inputLine.substring(
+				this.token.add(new Node("operator", inputLine.substring(
 						lexemeBegin, forward - 1)));
 				lexemeBegin = forward - 1;
 			}
 			m = comparator1.matcher(inputLine.substring(lexemeBegin, forward));
 			if (m.find()) {
-				this.token.add(new Token("comparator", inputLine.substring(
+				this.token.add(new Node("comparator", inputLine.substring(
 						lexemeBegin, forward)));
 				lexemeBegin = forward;
 				forward++;
 			}
 			m = comparator2.matcher(inputLine.substring(lexemeBegin, forward));
 			if (m.find()) {
-				this.token.add(new Token("comparator", inputLine.substring(
+				this.token.add(new Node("comparator", inputLine.substring(
 						lexemeBegin, forward - 1)));
 				lexemeBegin = forward - 1;
 			}
@@ -118,11 +118,11 @@ public class Lexer {
 		}
 	}
 
-	public Token getToken(int i) {
+	public Node getToken(int i) {
 		return this.token[i];
 	}
 
-	public ArrayList<Token> getToken() {
+	public ArrayList<Node> getToken() {
 		return this.token;
 	}
 }

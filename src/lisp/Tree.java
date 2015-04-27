@@ -1,50 +1,10 @@
 package lisp;
 
-import java.util.ArrayList;
 
 public class Tree {
-	private Token token;
-	private Tree parent;
-	private ArrayList<Tree> child;
-
-	public Tree(Token token) {
-		this();
-		this.token = token;
-	}
-
-	public Tree() {
-		this.child = new ArrayList<Tree>();
-	}
-
-	public Token getToken() {
-		return this.token;
-	}
-
-	public Tree getParent() {
-		return this.parent;
-	}
-
-	public Tree getChild(int i) {
-		return this.child.get(i);
-	}
-
-	public void setToken(Token token) {
-		this.token = token;
-	}
-
-	public void setParent(Tree parent) {
-		this.parent = parent;
-	}
-
-	public void setChild(Tree child, int i) {
-		this.child.set(i, child);
-	}
-}
-
-class TreeNode {
 	private Tree processedNode, rootNode;
 
-	public TreeNode() {
+	public Tree() {
 		this.processedNode = new Tree();
 		this.rootNode = this.processedNode;
 	}
@@ -60,7 +20,7 @@ class TreeNode {
 		}
 	}
 
-	public void add(Token token) {
+	public void add(Node token) {
 		for (int i = 0; true; i++) {
 			if (this.processedNode.getChild(i) == null) {
 				this.processedNode.setChild(new Tree(token), i);

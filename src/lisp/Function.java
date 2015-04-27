@@ -3,16 +3,16 @@ package lisp;
 public class Function{
 	private int functionNumber;
 	private String[] name;
-	private Token[][] argument;
+	private Node[][] argument;
 	private Tree[] substance;
 	public Function(){
 		this.functionNumber = 0;
 		this.name = new String[10];
-		this.argument = new Token[10][10];
+		this.argument = new Node[10][10];
 		this.substance = new Tree[10];
 	}
 
-	public void setFunction(String name,Token[] argument,Tree substance){
+	public void setFunction(String name,Node[] argument,Tree substance){
 		this.name[functionNumber] = name;
 		this.argument[functionNumber] = argument;
 		this.substance[functionNumber] = substance;

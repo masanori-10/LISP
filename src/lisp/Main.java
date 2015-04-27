@@ -2,24 +2,24 @@ package lisp;
 
 import java.io.IOException;
 
-public class Main{
-	public static void main(String[] args){
+public class Main {
+	public static void main(String[] args) {
 
 		Reader reader = new Reader();
 		Lexer lexer = new Lexer();
 		Parser parser = new Parser();
 		Eval eval = new Eval();
 
-		try{
+		try {
 			reader.read();
 			lexer.lexe(reader.getInputLine());
-			parser.parse(lexer.getToken(),lexer.getTokenNumber());
-			eval.evaluate(parser.getCompleteTree(),parser.getCompleteNumber());
-		}catch(SyntaxException e){
+			parser.parse(lexer2.getToken());
+			eval.evaluate(parser.getCompleteTree(), parser.getCompleteNumber());
+		} catch (SyntaxException e) {
 			System.out.println(e);
-		}catch(IOException e){
+		} catch (IOException e) {
 			System.out.println(e + "(Input is invalid.)");
-		}catch(OtherException e){
+		} catch (OtherException e) {
 			System.out.println(e);
 		}
 	}

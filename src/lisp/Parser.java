@@ -1,62 +1,33 @@
 package lisp;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Parser {
 	private TreeNode treeNode;
 	private int parenCount;
+	private Pattern group, bool, command, id, number, operator, comparator;
+	private Matcher m;
 
 	public Parser() {
 		this.treeNode = new TreeNode();
 		this.parenCount = 0;
+		this.group = Pattern.compile("^[\\(\\)]$");
+		this.bool = Pattern.compile("^(T|Nil)$");
+		this.command = Pattern.compile("^(setq|if|defun)$");
+		this.id = Pattern.compile("^[a-zA-Z]\\w*$");
+		this.number = Pattern.compile("^-?\\d+(\\.\\d+)?$");
+		this.operator = Pattern.compile("^[\\+\\-\\*\\/]$");
+		this.comparator = Pattern.compile("^(<=|>=|!=|=|<|>)$");
 	}
 
-	public void parse(ArrayList<Token> token) throws SyntaxException {
+	public void parse(ArrayList<String> token) throws SyntaxException {
 		int processe = 0;
 		while (processe < token.size()) {
-			switch (token.get(processe).getAttribute()) {
-			case "group":
-				if (token.get(processe).getName().equals("(")) {
-					if (parenCount != 0) {
-						this.treeNode.add(token[i]);
-					}
-					this.treeNode.open();
-					this.parenCount++;
-				} else {
-					this.treeNode.close();
-					this.parenCount--;
-					if (parenCount == 0) {
-						if (this.treeNode.getProcessedNode() != this.treeNode
-								.getRootNode()) {
-							throw new SyntaxException();
-						}
-						this.completeTree[this.completeNumber] = this.treeNode;
-						this.treeNode = new TreeNode();
-						this.completeNumber++;
-					} else {
-						while (this.treeNode.getParentNode().getToken() != null) {
-							if (this.treeNode.getParentNode().getToken()
-									.getArgumentCounter() == 0) {
-								this.treeNode.close();
-							} else {
-								break;
-							}
-						}
-					}
-				}
-				break;
-			case "command":
-			case "operator":
-			case "comparator":
-			case "defunedId":
-				this.treeNode.add(token.get(processe));
-				this.treeNode.moveToLastChild();
-				break;
-			case "number":
-			case "id":
-			case "bool":
-				this.treeNode.add(token.get(processe));
-				break;
+			m = number.matcher(token.get(processe));
+			if (m.find()) {
+
 			}
 		}
 	}

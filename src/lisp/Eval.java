@@ -1,13 +1,13 @@
 package lisp;
 
 public class Eval {
-	private Token result;
+	private Node result;
 	private TreeNode[] tree;
 	private int treeNumber;
 	private Function function;
 
 	public Eval() {
-		this.result = new Token();
+		this.result = new Node();
 		this.function = new Function();
 	}
 
@@ -25,12 +25,12 @@ public class Eval {
 					System.out.println(this.result.getValue());
 				}
 			} else {
-				this.result = new Token();
+				this.result = new Node();
 			}
 		}
 	}
 
-	public Token evaluate(Tree processedNode) throws OtherException,
+	public Node evaluate(Tree processedNode) throws OtherException,
 			SyntaxException {
 		double operandX, operandY;
 		switch (processedNode.getToken().getAttribute()) {
@@ -143,7 +143,7 @@ public class Eval {
 				}
 				return this.result;
 			case "defun":
-				Token[] argument = new Token[10];
+				Node[] argument = new Node[10];
 				processedNode.getChild(1).getToken().setAttribute("defunedId");
 				for (int i = 0; i < treeNumber; i++) {
 					this.adjustId(processedNode.getChild(1).getToken(),
@@ -225,7 +225,7 @@ public class Eval {
 		}
 	}
 
-	public void adjustId(Token token, Tree tree) {
+	public void adjustId(Node token, Tree tree) {
 		if (tree.getToken().getAttribute().equals("id")) {
 			if (tree.getToken().getName().equals(token.getName())) {
 				tree.setToken(token);

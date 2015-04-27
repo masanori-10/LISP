@@ -6,16 +6,16 @@ import java.util.regex.Pattern;
 
 public class Lexer2 {
 	private ArrayList<String> token;
-	private Pattern quick, slow, space, other;
-	private Matcher m;
+	private Pattern pQuick, pSlow, pSpace, pOther;
+	private Matcher mQuick, mSlow, mSpace, mOther;
 
 	public Lexer2() {
 		this.token = new ArrayList<String>();
-		this.quick = Pattern.compile("^(\\(|\\)|\\+|\\*|\\/|<=|>=|!=|=)$");
-		this.slow = Pattern
+		this.pQuick = Pattern.compile("^(\\(|\\)|\\+|\\*|\\/|<=|>=|!=|=)$");
+		this.pSlow = Pattern
 				.compile("^([a-zA-Z]\\w*\\W|-?\\d+(\\.\\d+)?\\D|-\\D|<[^=]|>[^=])$");
-		this.space = Pattern.compile("^[\\s]$");
-		this.other = Pattern
+		this.pSpace = Pattern.compile("^[\\s]$");
+		this.pOther = Pattern
 				.compile("^[^\\s\\(\\)a-zA-Z0-9<>=!\\+\\-\\*\\/\\.]$");
 	}
 
@@ -23,25 +23,24 @@ public class Lexer2 {
 		int lexemeBegin = 0, forward = 1;
 
 		while (inputLine.length() > forward) {
-			m = other.matcher(inputLine.substring(forward - 1, forward));
-			if (m.find()) {
+			mOther = pOther.matcher(inputLine.substring(forward - 1, forward));
+			mSpace = pSpace.matcher(inputLine.substring(lexemeBegin, forward));
+			mQuick = pQuick.matcher(inputLine.substring(lexemeBegin, forward));
+			mSlow = pSlow.matcher(inputLine.substring(lexemeBegin, forward));
+			if (mOther.find()) {
 				throw new SyntaxException();
-			}
-			m = space.matcher(inputLine.substring(lexemeBegin, forward));
-			if (m.find()) {
+			} else if (mSpace.find()) {
 				lexemeBegin++;
 				forward++;
-			}
-			m = quick.matcher(inputLine.substring(lexemeBegin, forward));
-			if (m.find()) {
+			} else if (mQuick.find()) {
 				this.token.add(inputLine.substring(lexemeBegin, forward));
 				lexemeBegin++;
 				forward++;
-			}
-			m = slow.matcher(inputLine.substring(lexemeBegin, forward));
-			if (m.find()) {
+			} else if (mSlow.find()) {
 				this.token.add(inputLine.substring(lexemeBegin, forward - 1));
 				lexemeBegin = forward - 1;
+			} else {
+				forward++;
 			}
 		}
 	}
