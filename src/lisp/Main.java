@@ -13,7 +13,7 @@ public class Main {
 		try {
 			reader.read();
 			lexer.lexe(reader.getInputLine());
-			parser.parse(lexer2.getToken());
+			parser.parse(lexer.getToken());
 			eval.evaluate(parser.getCompleteTree(), parser.getCompleteNumber());
 		} catch (SyntaxException e) {
 			System.out.println(e);

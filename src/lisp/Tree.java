@@ -1,11 +1,10 @@
 package lisp;
 
-
 public class Tree {
-	private Tree processedNode, rootNode;
+	private Node processedNode, rootNode;
 
 	public Tree() {
-		this.processedNode = new Tree();
+		this.processedNode = new DummyNode();
 		this.rootNode = this.processedNode;
 	}
 
@@ -20,11 +19,11 @@ public class Tree {
 		}
 	}
 
-	public void add(Node token) {
-		for (int i = 0; true; i++) {
-			if (this.processedNode.getChild(i) == null) {
-				this.processedNode.setChild(new Tree(token), i);
-				this.processedNode.getChild(i).setParent(this.processedNode);
+	public void addNode(Node node) throws SyntaxException {
+		while (true) {
+			if (this.processedNode.addNode(node) == false) {
+				this.moveToParant();
+			} else {
 				return;
 			}
 		}
@@ -34,7 +33,7 @@ public class Tree {
 		if (this.processedNode == this.rootNode) {
 			throw new SyntaxException();
 		}
-		this.processedNode = this.processedNode.getParent();
+		this.processedNode = this.processedNode.getParentNode();
 	}
 
 	public Tree getProcessedNode() {

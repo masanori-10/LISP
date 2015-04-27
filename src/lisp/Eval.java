@@ -4,11 +4,11 @@ public class Eval {
 	private Node result;
 	private TreeNode[] tree;
 	private int treeNumber;
-	private Function function;
+	private FunctionList function;
 
 	public Eval() {
 		this.result = new Node();
-		this.function = new Function();
+		this.function = new FunctionList();
 	}
 
 	public void evaluate(TreeNode[] tree, int treeNumber)
