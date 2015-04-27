@@ -49,7 +49,9 @@ public class Parser {
 				} else if (this.processedToken.equals("if")) {
 					this.inIf.add(this.groupCount);
 					this.tree.addAndMoveNode(new IfNode());
+					if (this.tree.getProcessedNode() instanceof IfNode) {
 
+					}
 				} else if (this.processedToken.equals("defun")) {
 					this.inDefun = this.groupCount;
 					this.tree.addAndMoveNode(new DefunNode());
@@ -114,6 +116,10 @@ public class Parser {
 				} else if (this.processedToken.equals(">")) {
 					this.tree.addAndMoveNode(new GreaterNode());
 				} else if (this.processedToken.equals("(")) {
+					this.tree.addNode(null);
+					if (this.tree.getProcessedNode() instanceof IfNode) {
+						this.tree.addNode(new DummyNode());
+					}
 					this.groupCount++;
 				} else {
 					this.groupCount--;
@@ -135,15 +141,25 @@ public class Parser {
 					this.tree.addNode(this.idList.getIdInFunctionNode(
 							this.functionNumber, this.idInFunctionNumber));
 				} else {
-					this.idNumber = this.idList
-							.getIdNumber(this.processedToken);
-					if (this.idNumber == -1) {
-						this.idNumber = this.idList
-								.setAndGetNewIdNumber(this.processedToken);
-						this.idList.setIdNode();
-						this.tree.addNode(this.idList.getIdNode(this.idNumber));
+					this.functionNumber = this.idList
+							.getFunctionNumber(this.processedToken);
+					if (this.functionNumber != -1) {
+						this.tree.addAndMoveNode(this.idList
+								.getFunctionNode(this.functionNumber));
+
 					} else {
-						this.tree.addNode(this.idList.getIdNode(this.idNumber));
+						this.idNumber = this.idList
+								.getIdNumber(this.processedToken);
+						if (this.idNumber == -1) {
+							this.idNumber = this.idList
+									.setAndGetNewIdNumber(this.processedToken);
+							this.idList.setIdNode();
+							this.tree.addNode(this.idList
+									.getIdNode(this.idNumber));
+						} else {
+							this.tree.addNode(this.idList
+									.getIdNode(this.idNumber));
+						}
 					}
 				}
 				this.processe++;

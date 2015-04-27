@@ -19,20 +19,41 @@ public abstract class Node {
 	}
 }
 
-class DummyNode extends Node {
+abstract class VoidNode extends Node {
+	public abstract void startup();
+}
+
+class DummyNode extends VoidNode {
 	private ArrayList<Node> childNode;
+	private int processe;
+	private Node processedNode;
+
+	public DummyNode() {
+		this.processe = 0;
+	}
 
 	public boolean addNode(Node node) {
 		this.childNode.add(node);
 		return true;
 	}
 
-	public ArrayList<Node> getChildNode() {
-		return this.childNode;
+	public void startup() {
+		do {
+			this.processedNode = this.childNode.get(processe);
+			if (this.processedNode instanceof ValueNode) {
+				((ValueNode) this.processedNode).getValue();
+			} else if (this.processedNode instanceof BooleanNode) {
+				((BooleanNode) this.processedNode).getBool();
+			} else if (this.processedNode instanceof VoidNode) {
+				((VoidNode) this.processedNode).startup();
+			}
+			this.processe++;
+		} while (this.processe < this.childNode.size());
 	}
+
 }
 
-class SetqNode extends Node {
+class SetqNode extends VoidNode {
 	private IdNode idNode;
 	private ValueNode valueNode;
 
@@ -50,40 +71,51 @@ class SetqNode extends Node {
 		}
 	}
 
-	public void startUp() {
+	public void startup() {
 		this.idNode.setValue(this.valueNode.getValue());
 	}
 }
 
-class IfNode extends Node {
+class IfNode extends VoidNode {
 	private BoolNode boolNode;
-	private ArrayList<Node> trueNode, falseNode;
-	private int closeCheck;
-
-	public IfNode() {
-		this.closeCheck = 2;
-	}
+	private Node trueNode, falseNode;
 
 	public boolean addNode(Node node) {
 		if (this.boolNode == null) {
 			this.boolNode = (BoolNode) node;
 			node.setParentNode(this);
 			return true;
-		} else if (this.closeCheck == 2) {
-			this.trueNode.add(node);
-			this.trueNode.get(this.trueNode.size() - 1).setParentNode(this);
+		} else if (this.trueNode == null) {
+			this.trueNode = node;
+			node.setParentNode(this);
 			return true;
-		} else if (this.closeCheck == 1) {
-			this.falseNode.add(node);
-			this.falseNode.get(this.falseNode.size() - 1).setParentNode(this);
+		} else if (this.falseNode == null) {
+			this.falseNode = node;
+			node.setParentNode(this);
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public void close() {
-		this.closeCheck--;
+	public void startup() {
+		if (this.boolNode.getBool() == true) {
+			if (this.trueNode instanceof ValueNode) {
+				((ValueNode) this.trueNode).getValue();
+			} else if (this.trueNode instanceof BooleanNode) {
+				((BooleanNode) this.trueNode).getBool();
+			} else if (this.trueNode instanceof VoidNode) {
+				((VoidNode) this.trueNode).startup();
+			}
+		} else {
+			if (this.falseNode instanceof ValueNode) {
+				((ValueNode) this.falseNode).getValue();
+			} else if (this.falseNode instanceof BooleanNode) {
+				((BooleanNode) this.falseNode).getBool();
+			} else if (this.falseNode instanceof VoidNode) {
+				((VoidNode) this.falseNode).startup();
+			}
+		}
 	}
 }
 
@@ -101,24 +133,23 @@ class DefunNode extends Node {
 	}
 }
 
-class FunctionNode extends Node {
+class FunctionNode extends VoidNode {
 	private ArrayList<IdNode> argNode;
-	private ArrayList<Node> substanceNode;
-	private int closeCheck;
+	private Node substanceNode;
+	private boolean closeCheck;
 
 	public FunctionNode() {
-		this.closeCheck = 2;
+		this.closeCheck = false;
 	}
 
 	public boolean addNode(Node node) {
-		if (this.closeCheck == 2) {
+		if (this.closeCheck == false) {
 			this.argNode.add((IdNode) node);
 			this.argNode.get(this.argNode.size() - 1).setParentNode(this);
 			return true;
-		} else if (this.closeCheck == 1) {
-			this.substanceNode.add(node);
-			this.substanceNode.get(this.substanceNode.size() - 1)
-					.setParentNode(this);
+		} else if (this.substanceNode == null) {
+			this.substanceNode = node;
+			node.setParentNode(this);
 			return true;
 		} else {
 			return false;
@@ -126,6 +157,16 @@ class FunctionNode extends Node {
 	}
 
 	public void close() {
-		this.closeCheck--;
+		this.closeCheck = true;
+	}
+
+	public void startup() {
+		if (this.substanceNode instanceof ValueNode) {
+			((ValueNode) this.substanceNode).getValue();
+		} else if (this.substanceNode instanceof BooleanNode) {
+			((BooleanNode) this.substanceNode).getBool();
+		} else if (this.substanceNode instanceof VoidNode) {
+			((VoidNode) this.substanceNode).startup();
+		}
 	}
 }
