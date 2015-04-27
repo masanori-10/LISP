@@ -1,5 +1,42 @@
 package lisp;
 
+abstract class ValueNode extends Node {
+	public abstract double getValue();
+}
+
+class NumberNode extends ValueNode {
+	private double value;
+
+	public NumberNode(double value) {
+		super();
+		this.value = value;
+	}
+
+	public boolean addNode(Node node) {
+		return false;
+	}
+
+	public double getValue() {
+		return this.value;
+	}
+}
+
+class IdNode extends ValueNode {
+	private double value;
+
+	public boolean addNode(Node node) {
+		return false;
+	}
+
+	public double getValue() {
+		return this.value;
+	}
+
+	public void setValue(double value) {
+		this.value = value;
+	}
+}
+
 abstract class OperatorNode extends ValueNode {
 	private ValueNode rightNode, leftNode;
 

@@ -8,15 +8,9 @@ public class Tree {
 		this.rootNode = this.processedNode;
 	}
 
-	public void moveToLastChild() throws SyntaxException {
-		if (this.processedNode.getChild(0) == null) {
-			throw new SyntaxException();
-		}
-		for (int i = 1; true; i++) {
-			if (this.processedNode.getChild(i) == null) {
-				this.processedNode = this.processedNode.getChild(i - 1);
-			}
-		}
+	public void addAndMoveNode(Node node) throws SyntaxException {
+		this.addNode(node);
+		this.processedNode = node;
 	}
 
 	public void addNode(Node node) throws SyntaxException {
@@ -36,15 +30,11 @@ public class Tree {
 		this.processedNode = this.processedNode.getParentNode();
 	}
 
-	public Tree getProcessedNode() {
+	public Node getProcessedNode() {
 		return this.processedNode;
 	}
 
-	public Tree getRootNode() {
+	public Node getRootNode() {
 		return this.rootNode;
-	}
-
-	public void setProcessedNode(Tree processedNode) {
-		this.processedNode = processedNode;
 	}
 }

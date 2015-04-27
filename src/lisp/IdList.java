@@ -7,6 +7,8 @@ public class IdList {
 	private ArrayList<IdNode> idNode;
 	private ArrayList<String> functionName;
 	private ArrayList<FunctionNode> functionNode;
+	private ArrayList<ArrayList<String>> idInFunctionName;
+	private ArrayList<ArrayList<IdNode>> idInFunctionNode;
 
 	public IdNode getIdNode(int idNodeNumber) {
 		return this.idNode.get(idNodeNumber);
@@ -40,5 +42,26 @@ public class IdList {
 	public int setAndGetNewFunctionNumber(String functionName) {
 		this.functionName.add(functionName);
 		return (this.functionName.size() - 1);
+	}
+
+	public IdNode getIdInFunctionNode(int functionNumber,
+			int idInFunctionNodeNumber) {
+		return this.idInFunctionNode.get(functionNumber).get(
+				idInFunctionNodeNumber);
+	}
+
+	public void setIdInFunctionNode(int functionNumber) {
+		this.idInFunctionNode.get(functionNumber).add(new IdNode());
+	}
+
+	public int getIdInFunctionNumber(int functionNumber, String idInFunctionName) {
+		return this.idInFunctionName.get(functionNumber).indexOf(
+				idInFunctionName);
+	}
+
+	public int setAndGetNewIdInFunctionNumber(int functionNumber,
+			String idInFunctionName) {
+		this.idInFunctionName.get(functionNumber).add(idInFunctionName);
+		return (this.idInFunctionName.get(functionNumber).size() - 1);
 	}
 }

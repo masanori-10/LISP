@@ -32,43 +32,6 @@ class DummyNode extends Node {
 	}
 }
 
-abstract class ValueNode extends Node {
-	public abstract double getValue();
-}
-
-class NumberNode extends ValueNode {
-	private double value;
-
-	public NumberNode(double value) {
-		super();
-		this.value = value;
-	}
-
-	public boolean addNode(Node node) {
-		return false;
-	}
-
-	public double getValue() {
-		return this.value;
-	}
-}
-
-class IdNode extends ValueNode {
-	private double value;
-
-	public boolean addNode(Node node) {
-		return false;
-	}
-
-	public double getValue() {
-		return this.value;
-	}
-
-	public void setValue(double value) {
-		this.value = value;
-	}
-}
-
 class SetqNode extends Node {
 	private IdNode idNode;
 	private ValueNode valueNode;
@@ -85,6 +48,10 @@ class SetqNode extends Node {
 		} else {
 			return false;
 		}
+	}
+
+	public void startUp() {
+		this.idNode.setValue(this.valueNode.getValue());
 	}
 }
 
@@ -113,6 +80,10 @@ class IfNode extends Node {
 		} else {
 			return false;
 		}
+	}
+
+	public void close() {
+		this.closeCheck--;
 	}
 }
 
@@ -152,5 +123,9 @@ class FunctionNode extends Node {
 		} else {
 			return false;
 		}
+	}
+
+	public void close() {
+		this.closeCheck--;
 	}
 }
