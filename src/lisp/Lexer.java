@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 public class Lexer {
 	private ArrayList<String> token;
+	private int lexemeBegin, forward;
 	private Pattern pQuick, pSlow, pSpace, pOther;
 	private Matcher mQuick, mSlow, mSpace, mOther;
 
@@ -20,7 +21,9 @@ public class Lexer {
 	}
 
 	public void lexe(String inputLine) throws SyntaxException {
-		int lexemeBegin = 0, forward = 1;
+		this.lexemeBegin = 0;
+		this.forward = 1;
+		this.token.clear();
 
 		while (inputLine.length() > forward) {
 			mOther = pOther.matcher(inputLine.substring(forward - 1, forward));
@@ -34,8 +37,8 @@ public class Lexer {
 				forward++;
 			} else if (mQuick.find()) {
 				this.token.add(inputLine.substring(lexemeBegin, forward));
-				lexemeBegin++;
 				forward++;
+				lexemeBegin = forward - 1;
 			} else if (mSlow.find()) {
 				this.token.add(inputLine.substring(lexemeBegin, forward - 1));
 				lexemeBegin = forward - 1;

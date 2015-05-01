@@ -4,24 +4,26 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lisp.Enum.Token;
+
 public class Parser {
 	private Tree tree;
 	private IdList idList;
 	private int processe;
 	private String processedToken;
-	private int groupCount;
-	private ArrayList<Integer> inIf;
-	private int inDefun;
-	private int functionNumber;
-	private int idInFunctionNumber;
-	private int idNumber;
+	private Token token;
+	private Node processedNode;
+	private ArrayList<Integer> groupCount;
+	private int groupCountEnd;
+	private boolean inFunction;
 	private Pattern pStatement, pId, pNumber;
 	private Matcher mStatement, mId, mNumber;
 
 	public Parser() {
 		this.tree = new Tree();
 		this.idList = new IdList();
-		this.groupCount = 0;
+		this.groupCount = new ArrayList<Integer>();
+		this.groupCountEnd = -1;
 		this.pStatement = Pattern
 				.compile("^(T|Nil|setq|if|defun|\\+|-|\\*|\\/|<=|>=|!=|=|<|>|\\(|\\))$");
 		this.pId = Pattern.compile("^[a-zA-Z]\\w*$");
@@ -32,138 +34,126 @@ public class Parser {
 		this.processe = 0;
 		while (this.processe < token.size()) {
 			this.processedToken = token.get(this.processe);
+			this.token = Token.getEnum(this.processedToken);
 			mNumber = pNumber.matcher(this.processedToken);
 			mStatement = pStatement.matcher(this.processedToken);
 			mId = pId.matcher(this.processedToken);
 			if (mNumber.find()) {
 				this.tree.addNode(new NumberNode(Double
 						.parseDouble(this.processedToken)));
-				this.processe++;
 			} else if (mStatement.find()) {
-				if (this.processedToken.equals("T")) {
+				switch (this.token) {
+				case T:
 					this.tree.addNode(new BoolNode(true));
-				} else if (this.processedToken.equals("Nil")) {
+					break;
+				case NIL:
 					this.tree.addNode(new BoolNode(false));
-				} else if (this.processedToken.equals("setq")) {
+					break;
+				case SETQ:
 					this.tree.addAndMoveNode(new SetqNode());
-				} else if (this.processedToken.equals("if")) {
-					this.inIf.add(this.groupCount);
+					break;
+				case IF:
 					this.tree.addAndMoveNode(new IfNode());
-					if (this.tree.getProcessedNode() instanceof IfNode) {
-
-					}
-				} else if (this.processedToken.equals("defun")) {
-					this.inDefun = this.groupCount;
+					break;
+				case DEFUN:
 					this.tree.addAndMoveNode(new DefunNode());
 					this.processe++;
 					this.processedToken = token.get(this.processe);
-					this.functionNumber = this.idList
-							.getFunctionNumber(this.processedToken);
-					if (this.functionNumber == -1) {
-						this.functionNumber = this.idList
-								.setAndGetNewFunctionNumber(this.processedToken);
-						this.idList.setFunctionNode();
-						this.tree.addAndMoveNode(this.idList
-								.getFunctionNode(this.functionNumber));
-					} else {
-						this.tree.addAndMoveNode(this.idList
-								.getFunctionNode(this.functionNumber));
-					}
-					this.processe++;
-					this.processedToken = token.get(this.processe);
-					if (this.processedToken.equals("(")) {
-						this.processe++;
-						this.processedToken = token.get(this.processe);
-						do {
-							this.idInFunctionNumber = this.idList
-									.setAndGetNewIdInFunctionNumber(
-											this.functionNumber,
-											this.processedToken);
-							this.idList
-									.setIdInFunctionNode(this.functionNumber);
-							this.tree.addNode(this.idList.getIdInFunctionNode(
-									this.functionNumber,
-									this.idInFunctionNumber));
-							this.processe++;
-							this.processedToken = token.get(this.processe);
-						} while (!(this.processedToken.equals(")")));
-					} else {
-						this.idList.setAndGetNewIdInFunctionNumber(
-								this.functionNumber, this.processedToken);
-						this.idList.setIdInFunctionNode(this.functionNumber);
-						this.tree.addNode(this.idList.getIdInFunctionNode(
-								this.functionNumber, 0));
-					}
-					((FunctionNode) this.tree.getProcessedNode()).close();
-				} else if (this.processedToken.equals("+")) {
+					this.tree.addAndMoveNode(this.idList
+							.addFunctionNode(this.processedToken));
+					break;
+				case PLUS:
 					this.tree.addAndMoveNode(new PlusNode());
-				} else if (this.processedToken.equals("-")) {
+					break;
+				case MINUS:
 					this.tree.addAndMoveNode(new MinusNode());
-				} else if (this.processedToken.equals("*")) {
+					break;
+				case MULT:
 					this.tree.addAndMoveNode(new MultNode());
-				} else if (this.processedToken.equals("/")) {
+					break;
+				case DIVIDE:
 					this.tree.addAndMoveNode(new DivideNode());
-				} else if (this.processedToken.equals("<=")) {
+					break;
+				case LESSEQUAL:
 					this.tree.addAndMoveNode(new LessEqualNode());
-				} else if (this.processedToken.equals(">=")) {
+					break;
+				case GREATEREQUAL:
 					this.tree.addAndMoveNode(new GreaterEqualNode());
-				} else if (this.processedToken.equals("!=")) {
+					break;
+				case NOTEQUAL:
 					this.tree.addAndMoveNode(new NotEqualNode());
-				} else if (this.processedToken.equals("=")) {
+					break;
+				case EQUAL:
 					this.tree.addAndMoveNode(new EqualNode());
-				} else if (this.processedToken.equals("<")) {
+					break;
+				case LESS:
 					this.tree.addAndMoveNode(new LessNode());
-				} else if (this.processedToken.equals(">")) {
+					break;
+				case GREATER:
 					this.tree.addAndMoveNode(new GreaterNode());
-				} else if (this.processedToken.equals("(")) {
+					break;
+				case OPEN:
 					this.tree.addNode(null);
-					if (this.tree.getProcessedNode() instanceof IfNode) {
-						this.tree.addNode(new DummyNode());
+					this.processedNode = this.tree.getProcessedNode();
+					if ((this.processedNode instanceof IfNode)
+							|| (this.processedNode instanceof FunctionNode)) {
+						this.tree.addAndMoveNode(new DummyNode());
+						this.groupCount.add(1);
+						this.groupCountEnd++;
+					} else if (!this.groupCount.isEmpty()) {
+						this.groupCount.set(this.groupCountEnd,
+								this.groupCount.get(this.groupCountEnd) + 1);
 					}
-					this.groupCount++;
-				} else {
-					this.groupCount--;
-					if (this.groupCount == this.inDefun - 1) {
-						((FunctionNode) this.tree.getProcessedNode()).close();
-						this.inDefun = 99;
-					} else if (this.groupCount == this.inIf.get(this.inIf
-							.size() - 1) - 1) {
-						((IfNode) this.tree.getProcessedNode()).close();
-						this.inIf.remove(this.inIf.size() - 1);
-					}
-				}
-				this.processe++;
-			} else if (mId.find()) {
-				if (inDefun <= groupCount) {
-					this.idInFunctionNumber = this.idList
-							.getIdInFunctionNumber(this.functionNumber,
-									this.processedToken);
-					this.tree.addNode(this.idList.getIdInFunctionNode(
-							this.functionNumber, this.idInFunctionNumber));
-				} else {
-					this.functionNumber = this.idList
-							.getFunctionNumber(this.processedToken);
-					if (this.functionNumber != -1) {
-						this.tree.addAndMoveNode(this.idList
-								.getFunctionNode(this.functionNumber));
-
-					} else {
-						this.idNumber = this.idList
-								.getIdNumber(this.processedToken);
-						if (this.idNumber == -1) {
-							this.idNumber = this.idList
-									.setAndGetNewIdNumber(this.processedToken);
-							this.idList.setIdNode();
-							this.tree.addNode(this.idList
-									.getIdNode(this.idNumber));
-						} else {
-							this.tree.addNode(this.idList
-									.getIdNode(this.idNumber));
+					break;
+				case CLOSE:
+					this.tree.addNode(null);
+					if (!this.groupCount.isEmpty()) {
+						this.groupCount.set(this.groupCountEnd,
+								this.groupCount.get(this.groupCountEnd) - 1);
+						if (this.groupCount.get(this.groupCountEnd) == 0) {
+							this.tree.moveToParant();
+							this.groupCount.remove(this.groupCountEnd);
+							this.groupCountEnd--;
 						}
 					}
 				}
-				this.processe++;
+			} else if (mId.find()) {
+				if (this.idList.checkFunctionName(this.processedToken)) {
+					this.tree.addAndMoveNode(this.idList
+							.getFunctionNode(this.processedToken));
+					this.processedNode = this.tree.getProcessedNode();
+					this.tree
+							.addAndMoveNode(new DummyNode(
+									((FunctionNode) this.processedNode)
+											.getArgCount()[0]));
+				} else {
+					this.processedNode = this.tree.getProcessedNode();
+					while (true) {
+						if (this.processedNode instanceof DefunNode) {
+							this.inFunction = true;
+							break;
+						}
+						if (this.processedNode.getParentNode() == null) {
+							this.inFunction = false;
+							break;
+						} else {
+							this.processedNode = this.processedNode
+									.getParentNode();
+						}
+					}
+					if (inFunction) {
+						this.tree.addNode(new IdInFunctionNode(this.idList
+								.getIdInFunctionValue(
+										((DefunNode) this.processedNode)
+												.getFunctionNode(),
+										this.processedToken)));
+					} else {
+						this.tree.addNode(new IdNode(this.idList
+								.getIdValue(this.processedToken)));
+					}
+				}
 			}
+			this.processe++;
 		}
 	}
 

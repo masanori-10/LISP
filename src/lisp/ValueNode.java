@@ -1,19 +1,15 @@
 package lisp;
 
-abstract class ValueNode extends Node {
-	public abstract double getValue();
+import java.util.ArrayList;
+
+public abstract class ValueNode extends Node {
 }
 
 class NumberNode extends ValueNode {
 	private double value;
 
 	public NumberNode(double value) {
-		super();
 		this.value = value;
-	}
-
-	public boolean addNode(Node node) {
-		return false;
 	}
 
 	public double getValue() {
@@ -22,67 +18,91 @@ class NumberNode extends ValueNode {
 }
 
 class IdNode extends ValueNode {
-	private double value;
+	private Double[] value;
 
-	public boolean addNode(Node node) {
-		return false;
+	public IdNode(Double[] value) {
+		this.value = value;
 	}
 
 	public double getValue() {
-		return this.value;
+		return this.value[0];
 	}
 
-	public void setValue(double value) {
+	public void setValue(Double value) {
+		this.value[0] = value;
+	}
+}
+
+class IdInFunctionNode extends ValueNode {
+	private ArrayList<Double> value;
+
+	public IdInFunctionNode(ArrayList<Double> value) {
 		this.value = value;
+	}
+
+	public double getValue() {
+		return this.value.get(this.value.size() - 1);
+	}
+
+	public void addValue(double value) {
+		this.value.add(value);
+	}
+
+	public void removeLastValue() {
+		this.value.remove(this.value.size() - 1);
 	}
 }
 
 abstract class OperatorNode extends ValueNode {
-	private ValueNode rightNode, leftNode;
+	private Node rightNode, leftNode;
 
-	public boolean addNode(Node valueNode) {
+	public boolean addNode(Node node) {
 		if (this.rightNode == null) {
-			this.rightNode = (ValueNode) valueNode;
-			valueNode.setParentNode(this);
+			this.rightNode = node;
+			if (!(node == null)) {
+				node.setParentNode(this);
+			}
 			return true;
 		} else if (this.leftNode == null) {
-			this.leftNode = (ValueNode) valueNode;
-			valueNode.setParentNode(this);
+			this.leftNode = node;
+			if (!(node == null)) {
+				node.setParentNode(this);
+			}
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public ValueNode getRightNode() {
+	public Node getRightNode() {
 		return this.rightNode;
 	}
 
-	public ValueNode getLeftNode() {
+	public Node getLeftNode() {
 		return this.leftNode;
 	}
 }
 
 class PlusNode extends OperatorNode {
-	public double getValue() {
-		return super.getRightNode().getValue() + super.getLeftNode().getValue();
+	public double getValue() throws SyntaxException {
+		return this.getRightNode().getValue() + this.getLeftNode().getValue();
 	}
 }
 
 class MinusNode extends OperatorNode {
-	public double getValue() {
-		return super.getRightNode().getValue() - super.getLeftNode().getValue();
+	public double getValue() throws SyntaxException {
+		return this.getRightNode().getValue() - this.getLeftNode().getValue();
 	}
 }
 
 class MultNode extends OperatorNode {
-	public double getValue() {
-		return super.getRightNode().getValue() * super.getLeftNode().getValue();
+	public double getValue() throws SyntaxException {
+		return this.getRightNode().getValue() * this.getLeftNode().getValue();
 	}
 }
 
 class DivideNode extends OperatorNode {
-	public double getValue() {
-		return super.getRightNode().getValue() / super.getLeftNode().getValue();
+	public double getValue() throws SyntaxException {
+		return this.getRightNode().getValue() / this.getLeftNode().getValue();
 	}
 }
