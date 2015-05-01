@@ -11,3 +11,9 @@ class ComandLineArgumentException extends Exception {
 		super("Comand line argument error.");
 	}
 }
+
+class FileReadException extends Exception {
+	public FileReadException() {
+		super("File read error.");
+	}
+}

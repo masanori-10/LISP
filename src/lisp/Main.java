@@ -25,6 +25,8 @@ public class Main {
 			System.out.println(e + "(Input is invalid.)");
 		} catch (ComandLineArgumentException e) {
 			System.out.println(e);
+		} catch (FileReadException e) {
+			System.out.println(e);
 		}
 	}
 }
