@@ -4,7 +4,7 @@ public class Tree {
 	private Node processedNode, rootNode;
 
 	public Tree() {
-		this.processedNode = new DummyNode(true);
+		this.processedNode = new DummyNode();
 		this.rootNode = this.processedNode;
 	}
 

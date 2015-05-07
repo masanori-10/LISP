@@ -6,63 +6,118 @@ import lisp.Enum.Token;
 
 public class Command {
 	private Token commandCode;
-	private double value;
+	private Value value;
+	private CommandLine commandLine;
+	private int index;
+	private boolean isEOF;
 	private static Stack stack;
 
 	public Command(double value) {
 		this.commandCode = Token.PUSH;
-		this.value = value;
+		this.value = new Value(value);
+	}
+
+	public Command(boolean value) {
+		this.commandCode = Token.PUSH;
+		this.value = new Value(value);
+	}
+
+	public Command(String key) {
+		if (MapForFunction.existFunction(key)) {
+			this.commandCode = Token.FUNCTION;
+			this.commandLine = MapForFunction.getFunction(key).getCommandLine();
+			this.index = 0;
+		}
+		this.commandCode = Token.PUSH;
+		this.value = new Value(key);
 	}
 
 	public Command(Token commandCode) {
 		this.commandCode = commandCode;
 	}
 
-	public void evaluate() {
+	public boolean execution() {
 		switch (this.commandCode) {
 		case PUSH:
 			stack.push(this.value);
 			break;
 		case PLUS:
-			stack.push(stack.popNumber2nd() + stack.popNumber());
+			stack.push(new Value(stack.pop2nd().getNumber()
+					+ stack.pop().getNumber()));
 			break;
 		case MINUS:
-			stack.push(stack.popNumber2nd() - stack.popNumber());
+			stack.push(new Value(stack.pop2nd().getNumber()
+					- stack.pop().getNumber()));
 			break;
 		case MULT:
-			stack.push(stack.popNumber2nd() * stack.popNumber());
+			stack.push(new Value(stack.pop2nd().getNumber()
+					* stack.pop().getNumber()));
 			break;
 		case DIVIDE:
-			stack.push(stack.popNumber2nd() / stack.popNumber());
+			stack.push(new Value(stack.pop2nd().getNumber()
+					/ stack.pop().getNumber()));
 			break;
 		case LESSEQUAL:
-			stack.push(stack.popNumber2nd() <= stack.popNumber());
+			stack.push(new Value(stack.pop2nd().getNumber() <= stack.pop()
+					.getNumber()));
 			break;
 		case GREATEREQUAL:
-			stack.push(stack.popNumber2nd() >= stack.popNumber());
+			stack.push(new Value(stack.pop2nd().getNumber() >= stack.pop()
+					.getNumber()));
 			break;
 		case NOTEQUAL:
-			stack.push(stack.popNumber2nd() != stack.popNumber());
+			stack.push(new Value(stack.pop2nd().getNumber() != stack.pop()
+					.getNumber()));
 			break;
 		case EQUAL:
-			stack.push(stack.popNumber2nd() == stack.popNumber());
+			stack.push(new Value(stack.pop2nd().getNumber() == stack.pop()
+					.getNumber()));
 			break;
 		case LESS:
-			stack.push(stack.popNumber2nd() < stack.popNumber());
+			stack.push(new Value(stack.pop2nd().getNumber() < stack.pop()
+					.getNumber()));
 			break;
 		case GREATER:
-			stack.push(stack.popNumber2nd() > stack.popNumber());
+			stack.push(new Value(stack.pop2nd().getNumber() > stack.pop()
+					.getNumber()));
 			break;
+		case SETQ:
+			stack.pop2nd().setVariable(stack.pop().getNumber());
+			break;
+		case IF:
+			if (stack.pop().getBool()) {
+
+			} else {
+
+			}
+			break;
+		case FUNCTION:
+			do {
+				this.isEOF = this.commandLine.getCommand(this.index)
+						.execution();
+				this.index++;
+			} while (!this.isEOF);
+			break;
+		case SETARG:
+			break;
+		case RESETARG:
+		case EOF:
+			return true;
 		default:
 			break;
 		}
+		return false;
 	}
 }
 
 class CommandLine {
-	private static ArrayList<Command> commandLine;
+	private ArrayList<Command> commandLine;
 
-	public static void addCommand(Command command) {
-		commandLine.add(command);
+	public void addCommand(Command command) {
+		this.commandLine.add(command);
+	}
+
+	public Command getCommand(int index) {
+		return this.commandLine.get(index);
 	}
 }

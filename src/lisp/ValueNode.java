@@ -1,7 +1,5 @@
 package lisp;
 
-import java.util.ArrayList;
-
 import lisp.Enum.Token;
 
 public abstract class ValueNode extends Node {
@@ -14,48 +12,32 @@ class NumberNode extends ValueNode {
 		this.value = value;
 	}
 
-	public double getValue() {
-		return this.value;
-	}
-
-	public void commandize() {
-		CommandLine.addCommand(new Command(this.value));
+	public void commandize(CommandLine commandLine) {
+		commandLine.addCommand(new Command(this.value));
 	}
 }
 
-class IdNode extends ValueNode {
-	private Double[] value;
+class VariableNode extends ValueNode {
+	private String key;
 
-	public IdNode(Double[] value) {
-		this.value = value;
+	public VariableNode(String key) {
+		this.key = key;
 	}
 
-	public double getValue() {
-		return this.value[0];
-	}
-
-	public void setValue(Double value) {
-		this.value[0] = value;
+	public void commandize(CommandLine commandLine) {
+		commandLine.addCommand(new Command(this.key));
 	}
 }
 
-class IdInFunctionNode extends ValueNode {
-	private ArrayList<Double> value;
+class ArgumentNode extends ValueNode {
+	private String key;
 
-	public IdInFunctionNode(ArrayList<Double> value) {
-		this.value = value;
+	public ArgumentNode(String key) {
+		this.key = key;
 	}
 
-	public double getValue() {
-		return this.value.get(this.value.size() - 1);
-	}
-
-	public void addValue(double value) {
-		this.value.add(value);
-	}
-
-	public void removeLastValue() {
-		this.value.remove(this.value.size() - 1);
+	public void commandize(CommandLine commandLine) {
+		commandLine.addCommand(new Command(this.key));
 	}
 }
 
@@ -85,9 +67,9 @@ class OperatorNode extends ValueNode {
 		}
 	}
 
-	public void commandize() {
-		this.rightNode.commandize();
-		this.leftNode.commandize();
-		CommandLine.addCommand(new Command(this.token));
+	public void commandize(CommandLine commandLine) {
+		this.rightNode.commandize(commandLine);
+		this.leftNode.commandize(commandLine);
+		commandLine.addCommand(new Command(this.token));
 	}
 }

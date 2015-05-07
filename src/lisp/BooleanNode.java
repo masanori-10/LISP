@@ -12,8 +12,8 @@ class BoolNode extends BooleanNode {
 		this.bool = bool;
 	}
 
-	public boolean getBool() {
-		return this.bool;
+	public void commandize(CommandLine commandLine) {
+		commandLine.addCommand(new Command(this.bool));
 	}
 }
 
@@ -43,9 +43,9 @@ class ComparatorNode extends BooleanNode {
 		}
 	}
 
-	public void commandize() {
-		this.rightNode.commandize();
-		this.leftNode.commandize();
-		CommandLine.addCommand(new Command(this.token));
+	public void commandize(CommandLine commandLine) {
+		this.rightNode.commandize(commandLine);
+		this.leftNode.commandize(commandLine);
+		commandLine.addCommand(new Command(this.token));
 	}
 }

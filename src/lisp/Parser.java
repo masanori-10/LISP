@@ -6,7 +6,6 @@ import lisp.Enum.Token;
 
 public class Parser {
 	private Tree tree;
-	private IdList idList;
 	private int index;
 	private String currentToken;
 	private Token token;
@@ -17,7 +16,6 @@ public class Parser {
 
 	public Parser() {
 		this.tree = new Tree();
-		this.idList = new IdList();
 		this.groupCount = new ArrayList<Integer>();
 		this.groupCountEnd = -1;
 	}
@@ -27,6 +25,20 @@ public class Parser {
 		while (this.index < token.size()) {
 			this.currentToken = token.get(this.index);
 			this.token = Token.getEnum(this.currentToken);
+
+			if (this.currentNode instanceof IfNode) {
+				if (((IfNode) this.currentNode).needTheDummy()) {
+					this.tree.addAndMoveNode(new DummyNode());
+					this.groupCount.add(0);
+					this.groupCountEnd++;
+				}
+			}
+			if (this.currentNode instanceof FunctionNode) {
+				this.tree.addAndMoveNode(new DummyNode());
+				this.groupCount.add(0);
+				this.groupCountEnd++;
+			}
+
 			if (this.isNumber(this.currentToken)) {
 				this.tree.addNode(new NumberNode(Double
 						.parseDouble(this.currentToken)));
@@ -48,8 +60,9 @@ public class Parser {
 					this.tree.addAndMoveNode(new DefunNode());
 					this.index++;
 					this.currentToken = token.get(this.index);
-					this.tree.addAndMoveNode(this.idList
-							.addFunctionNode(this.currentToken));
+					this.tree
+							.addAndMoveNode(new FunctionNode(this.currentToken));
+					MapForFunction.setFunction(this.currentToken);
 					break;
 				case PLUS:
 				case MINUS:
@@ -66,39 +79,21 @@ public class Parser {
 					this.tree.addAndMoveNode(new ComparatorNode(this.token));
 					break;
 				case OPEN:
-					this.tree.addNode(null);
-					this.currentNode = this.tree.getProcessedNode();
-					if ((this.currentNode instanceof IfNode)
-							|| (this.currentNode instanceof FunctionNode)) {
-						this.tree.addAndMoveNode(new DummyNode());
-						this.groupCount.add(1);
-						this.groupCountEnd++;
-					} else if (!this.groupCount.isEmpty()) {
+					if (!this.groupCount.isEmpty()) {
 						this.groupCount.set(this.groupCountEnd,
 								this.groupCount.get(this.groupCountEnd) + 1);
 					}
 					break;
 				case CLOSE:
-					this.tree.addNode(null);
 					if (!this.groupCount.isEmpty()) {
 						this.groupCount.set(this.groupCountEnd,
 								this.groupCount.get(this.groupCountEnd) - 1);
-						if (this.groupCount.get(this.groupCountEnd) == 0) {
-							this.tree.moveToParant();
-							this.groupCount.remove(this.groupCountEnd);
-							this.groupCountEnd--;
-						}
 					}
 					break;
 				default:
-					if (this.idList.checkFunctionName(this.currentToken)) {
-						this.tree.addAndMoveNode(this.idList
-								.getFunctionNode(this.currentToken));
-						this.currentNode = this.tree.getProcessedNode();
-						this.tree
-								.addAndMoveNode(new DummyNode(
-										((FunctionNode) this.currentNode)
-												.getArgCount()[0]));
+					if (MapForFunction.existFunction(this.currentToken)) {
+						this.tree.addAndMoveNode(new FunctionNode(
+								this.currentToken));
 					} else {
 						this.currentNode = this.tree.getProcessedNode();
 						while (true) {
@@ -115,19 +110,30 @@ public class Parser {
 							}
 						}
 						if (inFunction) {
-							this.tree.addNode(new IdInFunctionNode(this.idList
-									.getIdInFunctionValue(
+							this.tree.addNode(new ArgumentNode(
+									this.currentToken));
+							MapForFunction
+									.getFunction(
 											((DefunNode) this.currentNode)
-													.getFunctionNode(),
-											this.currentToken)));
+													.getFunctionNode().getKey())
+									.getMapForArgument()
+									.setArgument(currentToken);
 						} else {
-							this.tree.addNode(new IdNode(this.idList
-									.getIdValue(this.currentToken)));
+							this.tree.addNode(new VariableNode(
+									this.currentToken));
 						}
 					}
 				}
 			}
+			if (!this.groupCount.isEmpty()) {
+				if (this.groupCount.get(this.groupCountEnd) == 0) {
+					this.tree.moveToParant();
+					this.groupCount.remove(this.groupCountEnd);
+					this.groupCountEnd--;
+				}
+			}
 			this.index++;
+			this.tree.addNode(null);
 		}
 	}
 

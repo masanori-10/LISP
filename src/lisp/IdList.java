@@ -1,68 +1,83 @@
 package lisp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import lisp.Enum.Token;
 
 public class IdList {
-	private ArrayList<String> idName;
-	private ArrayList<Double[]> idValue;
-	private ArrayList<String> functionName;
-	private ArrayList<FunctionNode> functionNode;
-	private ArrayList<ArrayList<String>> idInFunctionName;
-	private ArrayList<ArrayList<ArrayList<Double>>> idInFunctionValue;
+	private static Map<String, Double> mapForVariable;
 
-	public IdList() {
-		this.idName = new ArrayList<String>();
-		this.idValue = new ArrayList<Double[]>();
-		this.functionName = new ArrayList<String>();
-		this.functionNode = new ArrayList<FunctionNode>();
-		this.idInFunctionName = new ArrayList<ArrayList<String>>();
-		this.idInFunctionValue = new ArrayList<ArrayList<ArrayList<Double>>>();
+	static {
+		mapForVariable = new HashMap<String, Double>();
 	}
 
-	public Double[] getIdValue(String idName) {
-		if (this.idName.indexOf(idName) == -1) {
-			this.idName.add(idName);
-			this.idValue.add(new Double[1]);
-		}
-		return this.idValue.get(this.idName.indexOf(idName));
+	public static void setVariable(String key, double value) {
+		mapForVariable.put(key, value);
 	}
 
-	public FunctionNode addFunctionNode(String functionName) {
-		if (this.functionName.indexOf(functionName) == -1) {
-			this.functionName.add(functionName);
-			this.functionNode.add(new FunctionNode(this.functionName
-					.indexOf(functionName)));
-			this.idInFunctionName.add(new ArrayList<String>());
-			this.idInFunctionValue.add(new ArrayList<ArrayList<Double>>());
-		}
-		return this.functionNode.get(this.functionName.indexOf(functionName));
+	public static double getVariable(String key) {
+		return mapForVariable.get(key);
+	}
+}
+
+class MapForArgument {
+	private Map<String, ArrayList<Double>> mapForArgument;
+
+	public MapForArgument() {
+		this.mapForArgument = new HashMap<String, ArrayList<Double>>();
 	}
 
-	public boolean checkFunctionName(String functionName) {
-		return this.functionName.contains(functionName);
+	public void setArgument(String key) {
+		this.mapForArgument.put(key, new ArrayList<Double>());
 	}
 
-	public FunctionNode getFunctionNode(String functionName) {
-		FunctionNode ret = new FunctionNode(
-				this.functionName.indexOf(functionName));
-		ret.adjustFunction(this.functionNode.get(this.functionName
-				.indexOf(functionName)));
-		return ret;
+	public ArrayList<Double> getArgument(String key) {
+		return this.mapForArgument.get(key);
+	}
+}
+
+class MapForFunction {
+	private static Map<String, FunctionBody> mapForFanction;
+
+	static {
+		mapForFanction = new HashMap<String, FunctionBody>();
 	}
 
-	public ArrayList<Double> getIdInFunctionValue(FunctionNode functionNode,
-			String idInFunctionName) {
-		if (this.idInFunctionName.get(functionNode.getFunctionNumber())
-				.indexOf(idInFunctionName) == -1) {
-			this.idInFunctionName.get(functionNode.getFunctionNumber()).add(
-					idInFunctionName);
-			this.idInFunctionValue.get(functionNode.getFunctionNumber()).add(
-					new ArrayList<Double>());
-			functionNode.addArgCount();
-		}
-		return this.idInFunctionValue.get(functionNode.getFunctionNumber())
-				.get(this.idInFunctionName
-						.get(functionNode.getFunctionNumber()).indexOf(
-								idInFunctionName));
+	public static boolean existFunction(String key) {
+		return mapForFanction.containsKey(key);
+	}
+
+	public static void setFunction(String key) {
+		mapForFanction.put(key, new FunctionBody());
+	}
+
+	public static FunctionBody getFunction(String key) {
+		return mapForFanction.get(key);
+	}
+}
+
+class FunctionBody {
+	private CommandLine commandLine;
+	private MapForArgument mapForArgument;
+
+	public FunctionBody() {
+		this.commandLine = new CommandLine();
+	}
+
+	public void setCommandLine(Node dummyArgNode, Node substanceNode) {
+		dummyArgNode.commandize(this.commandLine);
+		commandLine.addCommand(new Command(Token.SETARG));
+		substanceNode.commandize(this.commandLine);
+		commandLine.addCommand(new Command(Token.RESETARG));
+	}
+
+	public CommandLine getCommandLine() {
+		return this.commandLine;
+	}
+
+	public MapForArgument getMapForArgument() {
+		return this.mapForArgument;
 	}
 }

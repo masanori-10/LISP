@@ -9,7 +9,7 @@ public class Enum {
 		T("T"), NIL("Nil"), SETQ("setq"), IF("if"), DEFUN("defun"), PLUS("+"), MINUS(
 				"-"), MULT("*"), DIVIDE("/"), LESSEQUAL("<="), GREATEREQUAL(
 				">="), NOTEQUAL("!="), EQUAL("="), LESS("<"), GREATER(">"), OPEN(
-				"("), CLOSE(")"), PUSH, POP;
+				"("), CLOSE(")"), PUSH, POP, DUMMY, FUNCTION, SETARG, RESETARG, EOF;
 		private String name;
 
 		public String getName() {

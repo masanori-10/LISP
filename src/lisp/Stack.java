@@ -9,38 +9,20 @@ public class Stack {
 		this.stack = new ArrayList<Value>();
 	}
 
-	public void push(double value) {
-		this.stack.add(new Value(value));
+	public void push(Value value) {
+		this.stack.add(value);
 	}
 
-	public void push(boolean value) {
-		this.stack.add(new Value(value));
-	}
-
-	public double popNumber() {
-		double ret;
-		ret = this.stack.get(this.stack.size() - 1).getNumber();
+	public Value pop() {
+		Value ret;
+		ret = this.stack.get(this.stack.size() - 1);
 		this.stack.remove(this.stack.size() - 1);
 		return ret;
 	}
 
-	public double popNumber2nd() {
-		double ret;
-		ret = this.stack.get(this.stack.size() - 2).getNumber();
-		this.stack.remove(this.stack.size() - 2);
-		return ret;
-	}
-
-	public boolean popBool() {
-		boolean ret;
-		ret = this.stack.get(this.stack.size() - 1).getBool();
-		this.stack.remove(this.stack.size() - 1);
-		return ret;
-	}
-
-	public boolean popBool2nd() {
-		boolean ret;
-		ret = this.stack.get(this.stack.size() - 2).getBool();
+	public Value pop2nd() {
+		Value ret;
+		ret = this.stack.get(this.stack.size() - 2);
 		this.stack.remove(this.stack.size() - 2);
 		return ret;
 	}
@@ -49,6 +31,7 @@ public class Stack {
 class Value {
 	private double number;
 	private boolean bool;
+	private String key;
 
 	public Value(double number) {
 		this.number = number;
@@ -58,8 +41,19 @@ class Value {
 		this.bool = bool;
 	}
 
+	public Value(String key) {
+		this.key = key;
+	}
+
 	public double getNumber() {
+		if (this.key != null) {
+			return IdList.getVariable(key);
+		}
 		return this.number;
+	}
+
+	public void setVariable(double value) {
+		IdList.setVariable(key, value);
 	}
 
 	public boolean getBool() {

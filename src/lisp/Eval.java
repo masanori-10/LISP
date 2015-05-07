@@ -1,32 +1,23 @@
 package lisp;
 
-import lisp.Enum.ReturnChecker;
+import lisp.Enum.Token;
 
 public class Eval {
-	private ReturnChecker returnChecker;
+	private CommandLine commandLine;
+	private int index;
+	private boolean isEOF;
+
+	public Eval() {
+		this.commandLine = new CommandLine();
+		this.index = 0;
+	}
 
 	public void evaluate(Tree tree) throws SyntaxException {
-
-		while (true) {
-			this.returnChecker = ((VariableNode) tree.getRootNode()).check();
-			switch (this.returnChecker) {
-			case NULL:
-				return;
-			case VOID:
-				break;
-			case VALUE:
-				System.out.println(tree.getRootNode().getValue());
-				break;
-			case BOOL:
-				if (tree.getRootNode().getBool()) {
-					System.out.println("T");
-				} else {
-					System.out.println("Nil");
-				}
-				break;
-			case SETQ:
-				tree.getRootNode().setq();
-			}
-		}
+		tree.getRootNode().commandize(this.commandLine);
+		this.commandLine.addCommand(new Command(Token.EOF));
+		do {
+			this.isEOF = this.commandLine.getCommand(this.index).execution();
+			this.index++;
+		} while (!this.isEOF);
 	}
 }
