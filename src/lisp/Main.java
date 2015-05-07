@@ -13,12 +13,14 @@ public class Main {
 		Eval eval = new Eval();
 
 		try {
+
 			do {
 				toNext = reader.read(args);
 				lexer.lexe(reader.getInputLine());
 				parser.parse(lexer.getToken());
 				eval.evaluate(parser.getTree());
 			} while (toNext);
+
 		} catch (SyntaxException e) {
 			System.out.println(e);
 		} catch (IOException e) {

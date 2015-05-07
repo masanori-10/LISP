@@ -2,6 +2,8 @@ package lisp;
 
 import java.util.ArrayList;
 
+import lisp.Enum.Token;
+
 public abstract class ValueNode extends Node {
 }
 
@@ -14,6 +16,10 @@ class NumberNode extends ValueNode {
 
 	public double getValue() {
 		return this.value;
+	}
+
+	public void commandize() {
+		CommandLine.addCommand(new Command(this.value));
 	}
 }
 
@@ -53,8 +59,13 @@ class IdInFunctionNode extends ValueNode {
 	}
 }
 
-abstract class OperatorNode extends ValueNode {
+class OperatorNode extends ValueNode {
 	private Node rightNode, leftNode;
+	private Token token;
+
+	public OperatorNode(Token token) {
+		this.token = token;
+	}
 
 	public boolean addNode(Node node) {
 		if (this.rightNode == null) {
@@ -74,35 +85,9 @@ abstract class OperatorNode extends ValueNode {
 		}
 	}
 
-	public Node getRightNode() {
-		return this.rightNode;
-	}
-
-	public Node getLeftNode() {
-		return this.leftNode;
-	}
-}
-
-class PlusNode extends OperatorNode {
-	public double getValue() throws SyntaxException {
-		return this.getRightNode().getValue() + this.getLeftNode().getValue();
-	}
-}
-
-class MinusNode extends OperatorNode {
-	public double getValue() throws SyntaxException {
-		return this.getRightNode().getValue() - this.getLeftNode().getValue();
-	}
-}
-
-class MultNode extends OperatorNode {
-	public double getValue() throws SyntaxException {
-		return this.getRightNode().getValue() * this.getLeftNode().getValue();
-	}
-}
-
-class DivideNode extends OperatorNode {
-	public double getValue() throws SyntaxException {
-		return this.getRightNode().getValue() / this.getLeftNode().getValue();
+	public void commandize() {
+		this.rightNode.commandize();
+		this.leftNode.commandize();
+		CommandLine.addCommand(new Command(this.token));
 	}
 }

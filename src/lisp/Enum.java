@@ -9,11 +9,14 @@ public class Enum {
 		T("T"), NIL("Nil"), SETQ("setq"), IF("if"), DEFUN("defun"), PLUS("+"), MINUS(
 				"-"), MULT("*"), DIVIDE("/"), LESSEQUAL("<="), GREATEREQUAL(
 				">="), NOTEQUAL("!="), EQUAL("="), LESS("<"), GREATER(">"), OPEN(
-				"("), CLOSE(")");
+				"("), CLOSE(")"), PUSH, POP;
 		private String name;
 
 		public String getName() {
 			return this.name();
+		}
+
+		private Token() {
 		}
 
 		private Token(String name) {

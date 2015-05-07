@@ -6,6 +6,10 @@ public abstract class Node {
 	public Node() {
 	}
 
+	public void commandize() {
+
+	}
+
 	public boolean addNode(Node node) {
 		return false;
 	}

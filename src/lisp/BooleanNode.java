@@ -1,5 +1,7 @@
 package lisp;
 
+import lisp.Enum.Token;
+
 public abstract class BooleanNode extends Node {
 }
 
@@ -15,8 +17,13 @@ class BoolNode extends BooleanNode {
 	}
 }
 
-abstract class ComparatorNode extends BooleanNode {
+class ComparatorNode extends BooleanNode {
 	private Node rightNode, leftNode;
+	private Token token;
+
+	public ComparatorNode(Token token) {
+		this.token = token;
+	}
 
 	public boolean addNode(Node node) {
 		if (this.rightNode == null) {
@@ -36,47 +43,9 @@ abstract class ComparatorNode extends BooleanNode {
 		}
 	}
 
-	public Node getRightNode() {
-		return this.rightNode;
-	}
-
-	public Node getLeftNode() {
-		return this.leftNode;
-	}
-}
-
-class EqualNode extends ComparatorNode {
-	public boolean getBool() throws SyntaxException {
-		return (this.getRightNode().getValue() == this.getLeftNode().getValue());
-	}
-}
-
-class NotEqualNode extends ComparatorNode {
-	public boolean getBool() throws SyntaxException {
-		return (this.getRightNode().getValue() != this.getLeftNode().getValue());
-	}
-}
-
-class LessNode extends ComparatorNode {
-	public boolean getBool() throws SyntaxException {
-		return (this.getRightNode().getValue() < this.getLeftNode().getValue());
-	}
-}
-
-class LessEqualNode extends ComparatorNode {
-	public boolean getBool() throws SyntaxException {
-		return (this.getRightNode().getValue() <= this.getLeftNode().getValue());
-	}
-}
-
-class GreaterNode extends ComparatorNode {
-	public boolean getBool() throws SyntaxException {
-		return (this.getRightNode().getValue() > this.getLeftNode().getValue());
-	}
-}
-
-class GreaterEqualNode extends ComparatorNode {
-	public boolean getBool() throws SyntaxException {
-		return (this.getRightNode().getValue() >= this.getLeftNode().getValue());
+	public void commandize() {
+		this.rightNode.commandize();
+		this.leftNode.commandize();
+		CommandLine.addCommand(new Command(this.token));
 	}
 }
