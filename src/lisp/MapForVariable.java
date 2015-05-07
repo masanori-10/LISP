@@ -6,7 +6,7 @@ import java.util.Map;
 
 import lisp.Enum.Token;
 
-public class IdList {
+class MapForVariable {
 	private static Map<String, Double> mapForVariable;
 
 	static {
@@ -23,18 +23,22 @@ public class IdList {
 }
 
 class MapForArgument {
-	private Map<String, ArrayList<Double>> mapForArgument;
+	private static Map<String, ArrayList<Double>> mapForArgument;
 
-	public MapForArgument() {
-		this.mapForArgument = new HashMap<String, ArrayList<Double>>();
+	static {
+		mapForArgument = new HashMap<String, ArrayList<Double>>();
 	}
 
-	public void setArgument(String key) {
-		this.mapForArgument.put(key, new ArrayList<Double>());
+	public static boolean existArgument(String key) {
+		return mapForArgument.containsKey(key);
 	}
 
-	public ArrayList<Double> getArgument(String key) {
-		return this.mapForArgument.get(key);
+	public static void setArgument(String key) {
+		mapForArgument.put(key, new ArrayList<Double>());
+	}
+
+	public static ArrayList<Double> getArgument(String key) {
+		return mapForArgument.get(key);
 	}
 }
 
@@ -60,24 +64,19 @@ class MapForFunction {
 
 class FunctionBody {
 	private CommandLine commandLine;
-	private MapForArgument mapForArgument;
 
 	public FunctionBody() {
 		this.commandLine = new CommandLine();
 	}
 
 	public void setCommandLine(Node dummyArgNode, Node substanceNode) {
-		dummyArgNode.commandize(this.commandLine);
+		dummyArgNode.makeCommand(this.commandLine);
 		commandLine.addCommand(new Command(Token.SETARG));
-		substanceNode.commandize(this.commandLine);
+		substanceNode.makeCommand(this.commandLine);
 		commandLine.addCommand(new Command(Token.RESETARG));
 	}
 
 	public CommandLine getCommandLine() {
 		return this.commandLine;
-	}
-
-	public MapForArgument getMapForArgument() {
-		return this.mapForArgument;
 	}
 }

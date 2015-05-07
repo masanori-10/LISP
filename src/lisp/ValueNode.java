@@ -12,7 +12,7 @@ class NumberNode extends ValueNode {
 		this.value = value;
 	}
 
-	public void commandize(CommandLine commandLine) {
+	public void makeCommand(CommandLine commandLine) {
 		commandLine.addCommand(new Command(this.value));
 	}
 }
@@ -24,19 +24,7 @@ class VariableNode extends ValueNode {
 		this.key = key;
 	}
 
-	public void commandize(CommandLine commandLine) {
-		commandLine.addCommand(new Command(this.key));
-	}
-}
-
-class ArgumentNode extends ValueNode {
-	private String key;
-
-	public ArgumentNode(String key) {
-		this.key = key;
-	}
-
-	public void commandize(CommandLine commandLine) {
+	public void makeCommand(CommandLine commandLine) {
 		commandLine.addCommand(new Command(this.key));
 	}
 }
@@ -67,9 +55,9 @@ class OperatorNode extends ValueNode {
 		}
 	}
 
-	public void commandize(CommandLine commandLine) {
-		this.rightNode.commandize(commandLine);
-		this.leftNode.commandize(commandLine);
+	public void makeCommand(CommandLine commandLine) {
+		this.rightNode.makeCommand(commandLine);
+		this.leftNode.makeCommand(commandLine);
 		commandLine.addCommand(new Command(this.token));
 	}
 }

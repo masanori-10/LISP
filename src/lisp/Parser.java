@@ -110,14 +110,16 @@ public class Parser {
 							}
 						}
 						if (inFunction) {
-							this.tree.addNode(new ArgumentNode(
-									this.currentToken));
-							MapForFunction
-									.getFunction(
-											((DefunNode) this.currentNode)
-													.getFunctionNode().getKey())
-									.getMapForArgument()
-									.setArgument(currentToken);
+							this.tree.addNode(new VariableNode(
+									((DefunNode) this.currentNode)
+											.getFunctionNode().getKey()
+											+ "\\"
+											+ this.currentToken));
+							MapForArgument
+									.setArgument(((DefunNode) this.currentNode)
+											.getFunctionNode().getKey()
+											+ "\\"
+											+ this.currentToken);
 						} else {
 							this.tree.addNode(new VariableNode(
 									this.currentToken));

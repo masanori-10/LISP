@@ -26,34 +26,62 @@ public class Stack {
 		this.stack.remove(this.stack.size() - 2);
 		return ret;
 	}
+
+	public Value read() {
+		return this.stack.get(this.stack.size() - 1);
+	}
 }
 
 class Value {
 	private double number;
 	private boolean bool;
 	private String key;
+	private boolean isNull;
+
+	public Value() {
+		this.isNull = true;
+	}
 
 	public Value(double number) {
 		this.number = number;
+		this.isNull = false;
 	}
 
 	public Value(boolean bool) {
 		this.bool = bool;
+		this.isNull = false;
 	}
 
 	public Value(String key) {
 		this.key = key;
+		this.isNull = false;
+	}
+
+	public boolean isNull() {
+		return this.isNull;
 	}
 
 	public double getNumber() {
 		if (this.key != null) {
-			return IdList.getVariable(key);
+			if (MapForArgument.existArgument(this.key)) {
+				return MapForArgument.getArgument(this.key).get(
+						MapForArgument.getArgument(this.key).size() - 1);
+			}
+			return MapForVariable.getVariable(this.key);
 		}
 		return this.number;
 	}
 
 	public void setVariable(double value) {
-		IdList.setVariable(key, value);
+		if (MapForArgument.existArgument(this.key)) {
+			MapForArgument.getArgument(this.key).add(value);
+		}
+		MapForVariable.setVariable(this.key, value);
+	}
+
+	public void resetVariable() {
+		MapForArgument.getArgument(this.key).remove(
+				MapForArgument.getArgument(this.key).size() - 1);
 	}
 
 	public boolean getBool() {

@@ -13,7 +13,7 @@ public class Eval {
 	}
 
 	public void evaluate(Tree tree) throws SyntaxException {
-		tree.getRootNode().commandize(this.commandLine);
+		tree.getRootNode().makeCommand(this.commandLine);
 		this.commandLine.addCommand(new Command(Token.EOF));
 		do {
 			this.isEOF = this.commandLine.getCommand(this.index).execution();

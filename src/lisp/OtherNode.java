@@ -24,9 +24,9 @@ class DummyNode extends OtherNode {
 		return true;
 	}
 
-	public void commandize(CommandLine commandLine) {
+	public void makeCommand(CommandLine commandLine) {
 		for (int i = 0; i < this.childNode.size() - 1; i++) {
-			this.childNode.get(i).commandize(commandLine);
+			this.childNode.get(i).makeCommand(commandLine);
 		}
 		commandLine.addCommand(new Command(Token.DUMMY));
 	}
@@ -70,22 +70,20 @@ class IfNode extends OtherNode {
 		return this.needTheDummy;
 	}
 
-	public void commandize(CommandLine commandLine) {
-		this.boolNode.commandize(commandLine);
+	public void makeCommand(CommandLine commandLine) {
+		this.boolNode.makeCommand(commandLine);
 		commandLine.addCommand(new Command(Token.IF));
-		this.trueNode.commandize(commandLine);
-		this.falseNode.commandize(commandLine);
+		this.trueNode.makeCommand(commandLine);
+		this.falseNode.makeCommand(commandLine);
 	}
 }
 
 class FunctionNode extends OtherNode {
 	private Node dummyArgNode, substanceNode, actualArgNode;
 	private String key;
-	private ArrayList<ArrayList<Double>> stock;
 
 	public FunctionNode(String key) {
 		this.key = key;
-		this.stock = new ArrayList<ArrayList<Double>>();
 	}
 
 	public boolean addNode(Node node) {
@@ -122,38 +120,8 @@ class FunctionNode extends OtherNode {
 		return this.key;
 	}
 
-	public void commandize(CommandLine commandLine) {
-		this.actualArgNode.commandize(commandLine);
+	public void makeCommand(CommandLine commandLine) {
+		this.actualArgNode.makeCommand(commandLine);
 		commandLine.addCommand(new Command(this.key));
-	}
-
-	public void setArgument() throws SyntaxException {
-		if (this.dummyArgNode instanceof DummyNode) {
-			for (int i = 0; i < this.argCount[0]; i++) {
-				this.stock.get(i).add(
-						((DummyNode) this.actualArgNode).getValue(i));
-			}
-			for (int i = 0; i < this.argCount[0]; i++) {
-				((ArgumentNode) ((DummyNode) this.dummyArgNode).getChildNode()
-						.get(i)).addValue(this.stock.get(i).get(
-						(this.stock.get(i)).size() - 1));
-				this.stock.get(i).remove((this.stock.get(i)).size() - 1);
-			}
-		} else {
-			((ArgumentNode) this.dummyArgNode)
-					.addValue(((DummyNode) this.actualArgNode).getValue(0));
-		}
-	}
-
-	public void clearArgument() {
-		if (this.dummyArgNode instanceof DummyNode) {
-			for (int i = 0; i < ((DummyNode) this.dummyArgNode).getChildNode()
-					.size(); i++) {
-				((ArgumentNode) ((DummyNode) this.dummyArgNode).getChildNode()
-						.get(i)).removeLastValue();
-			}
-		} else {
-			((ArgumentNode) this.dummyArgNode).removeLastValue();
-		}
 	}
 }

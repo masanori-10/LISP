@@ -8,9 +8,7 @@ public abstract class Node {
 	public Node() {
 	}
 
-	public void commandize(CommandLine commandLine) {
-
-	}
+	public abstract void makeCommand(CommandLine commandLine);
 
 	public boolean addNode(Node node) {
 		return false;
@@ -47,9 +45,9 @@ class SetqNode extends Node {
 		}
 	}
 
-	public void commandize(CommandLine commandLine) {
-		this.variableNode.commandize(commandLine);
-		this.valueNode.commandize(commandLine);
+	public void makeCommand(CommandLine commandLine) {
+		this.variableNode.makeCommand(commandLine);
+		this.valueNode.makeCommand(commandLine);
 		commandLine.addCommand(new Command(Token.SETQ));
 	}
 }
@@ -71,5 +69,8 @@ class DefunNode extends Node {
 
 	public FunctionNode getFunctionNode() {
 		return this.functionNode;
+	}
+
+	public void makeCommand(CommandLine commandline) {
 	}
 }

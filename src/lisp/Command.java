@@ -10,6 +10,8 @@ public class Command {
 	private CommandLine commandLine;
 	private int index;
 	private boolean isEOF;
+	private ArrayList<Value> dummyArg;
+	private ArrayList<Value> actualArg;
 	private static Stack stack;
 
 	public Command(double value) {
@@ -27,9 +29,12 @@ public class Command {
 			this.commandCode = Token.FUNCTION;
 			this.commandLine = MapForFunction.getFunction(key).getCommandLine();
 			this.index = 0;
+			this.dummyArg = new ArrayList<Value>();
+			this.actualArg = new ArrayList<Value>();
+		} else {
+			this.commandCode = Token.PUSH;
+			this.value = new Value(key);
 		}
-		this.commandCode = Token.PUSH;
-		this.value = new Value(key);
 	}
 
 	public Command(Token commandCode) {
@@ -99,10 +104,27 @@ public class Command {
 			} while (!this.isEOF);
 			break;
 		case SETARG:
+			stack.pop();
+			do {
+				this.dummyArg.add(stack.pop());
+			} while (!stack.read().isNull());
+			for (int i = 0; i < this.dummyArg.size(); i++) {
+				this.actualArg.add(stack.pop());
+			}
+			for (int i = 0; i < this.dummyArg.size(); i++) {
+				this.dummyArg.get(i).setVariable(
+						this.actualArg.get(i).getNumber());
+			}
 			break;
 		case RESETARG:
+			for (int i = 0; i < this.dummyArg.size(); i++) {
+				this.dummyArg.get(i).resetVariable();
+			}
 		case EOF:
 			return true;
+		case DUMMY:
+			stack.push(new Value());
+			break;
 		default:
 			break;
 		}
