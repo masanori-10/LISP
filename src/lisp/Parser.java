@@ -24,78 +24,17 @@ public class Parser {
 		this.index = 0;
 		while (this.index < token.size()) {
 			this.currentToken = token.get(this.index);
-			this.token = Token.getEnum(this.currentToken);
-
-			if (this.currentNode instanceof IfNode) {
-				if (((IfNode) this.currentNode).needTheDummy()) {
-					this.tree.addAndMoveNode(new DummyNode());
-					this.groupCount.add(0);
-					this.groupCountEnd++;
-				}
-			}
-			if (this.currentNode instanceof FunctionNode) {
-				this.tree.addAndMoveNode(new DummyNode());
-				this.groupCount.add(0);
-				this.groupCountEnd++;
-			}
-
 			if (this.isNumber(this.currentToken)) {
 				this.tree.addNode(new NumberNode(Double
 						.parseDouble(this.currentToken)));
 			} else {
-				switch (this.token) {
-				case T:
-					this.tree.addNode(new BoolNode(true));
-					break;
-				case NIL:
-					this.tree.addNode(new BoolNode(false));
-					break;
-				case SETQ:
-					this.tree.addAndMoveNode(new SetqNode());
-					break;
-				case IF:
-					this.tree.addAndMoveNode(new IfNode());
-					break;
-				case DEFUN:
-					this.tree.addAndMoveNode(new DefunNode());
-					this.index++;
-					this.currentToken = token.get(this.index);
-					this.tree
-							.addAndMoveNode(new FunctionNode(this.currentToken));
-					MapForFunction.setFunction(this.currentToken);
-					break;
-				case PLUS:
-				case MINUS:
-				case MULT:
-				case DIVIDE:
-					this.tree.addAndMoveNode(new OperatorNode(this.token));
-					break;
-				case LESSEQUAL:
-				case GREATEREQUAL:
-				case NOTEQUAL:
-				case EQUAL:
-				case LESS:
-				case GREATER:
-					this.tree.addAndMoveNode(new ComparatorNode(this.token));
-					break;
-				case OPEN:
-					if (!this.groupCount.isEmpty()) {
-						this.groupCount.set(this.groupCountEnd,
-								this.groupCount.get(this.groupCountEnd) + 1);
-					}
-					break;
-				case CLOSE:
-					if (!this.groupCount.isEmpty()) {
-						this.groupCount.set(this.groupCountEnd,
-								this.groupCount.get(this.groupCountEnd) - 1);
-					}
-					break;
-				default:
+				this.token = Token.getEnum(this.currentToken);
+				if (this.token == null) {
 					if (MapForFunction.existFunction(this.currentToken)) {
 						this.tree.addAndMoveNode(new FunctionNode(
 								this.currentToken));
 					} else {
-						this.currentNode = this.tree.getProcessedNode();
+						this.currentNode = this.tree.getCurrentNode();
 						while (true) {
 							if (this.currentNode instanceof DefunNode) {
 								this.inFunction = true;
@@ -125,17 +64,76 @@ public class Parser {
 									this.currentToken));
 						}
 					}
-				}
-			}
-			if (!this.groupCount.isEmpty()) {
-				if (this.groupCount.get(this.groupCountEnd) == 0) {
-					this.tree.moveToParant();
-					this.groupCount.remove(this.groupCountEnd);
-					this.groupCountEnd--;
+				} else {
+					switch (this.token) {
+					case T:
+						this.tree.addNode(new BoolNode(true));
+						break;
+					case NIL:
+						this.tree.addNode(new BoolNode(false));
+						break;
+					case SETQ:
+						this.tree.addAndMoveNode(new SetqNode());
+						break;
+					case IF:
+						this.tree.addAndMoveNode(new IfNode());
+						break;
+					case DEFUN:
+						this.tree.addAndMoveNode(new DefunNode());
+						this.index++;
+						this.currentToken = token.get(this.index);
+						this.tree.addAndMoveNode(new FunctionNode(
+								this.currentToken));
+						MapForFunction.setFunction(this.currentToken);
+						break;
+					case PLUS:
+					case MINUS:
+					case MULT:
+					case DIVIDE:
+						this.tree.addAndMoveNode(new OperatorNode(this.token));
+						break;
+					case LESSEQUAL:
+					case GREATEREQUAL:
+					case NOTEQUAL:
+					case EQUAL:
+					case LESS:
+					case GREATER:
+						this.tree
+								.addAndMoveNode(new ComparatorNode(this.token));
+						break;
+					case OPEN:
+						this.tree.addNode(null);
+						this.currentNode = this.tree.getCurrentNode();
+						if ((this.currentNode instanceof IfNode)
+								|| (this.currentNode instanceof FunctionNode)) {
+							this.tree.addAndMoveNode(new DummyNode());
+							this.groupCount.add(1);
+							this.groupCountEnd++;
+						} else if (!this.groupCount.isEmpty()) {
+							this.groupCount
+									.set(this.groupCountEnd, this.groupCount
+											.get(this.groupCountEnd) + 1);
+						}
+						break;
+					case CLOSE:
+						this.tree.addNode(null);
+						if (!this.groupCount.isEmpty()) {
+							this.groupCount
+									.set(this.groupCountEnd, this.groupCount
+											.get(this.groupCountEnd) - 1);
+							if (this.groupCount.get(this.groupCountEnd) == 0) {
+								this.tree.moveToParant();
+								this.groupCount.remove(this.groupCountEnd);
+								this.groupCountEnd--;
+							}
+						}
+						break;
+					default:
+						throw new SyntaxException();
+					}
 				}
 			}
 			this.index++;
-			this.tree.addNode(null);
 		}
 	}
 

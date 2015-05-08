@@ -5,9 +5,6 @@ import lisp.Enum.Token;
 public abstract class Node {
 	private Node parentNode;
 
-	public Node() {
-	}
-
 	public abstract void makeCommand(CommandLine commandLine);
 
 	public boolean addNode(Node node) {

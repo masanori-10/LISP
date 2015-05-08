@@ -1,26 +1,27 @@
 package lisp;
 
 public class Enum {
-	public enum ReturnChecker {
-		NULL, VOID, VALUE, BOOL, SETQ
+	public enum Label {
+		EOTRUE, EOFALSE, SOIF;
 	}
 
 	public enum Token {
 		T("T"), NIL("Nil"), SETQ("setq"), IF("if"), DEFUN("defun"), PLUS("+"), MINUS(
 				"-"), MULT("*"), DIVIDE("/"), LESSEQUAL("<="), GREATEREQUAL(
 				">="), NOTEQUAL("!="), EQUAL("="), LESS("<"), GREATER(">"), OPEN(
-				"("), CLOSE(")"), PUSH, POP, DUMMY, FUNCTION, SETARG, RESETARG, EOF;
+				"("), CLOSE(")"), PUSH, FUNCTION, SETARG, RESETARG, JUMP, PUSHNULL, EOF, LABEL;
 		private String name;
 
-		public String getName() {
-			return this.name();
-		}
-
 		private Token() {
+			this.name = null;
 		}
 
 		private Token(String name) {
 			this.name = name;
+		}
+
+		public String getName() {
+			return this.name();
 		}
 
 		public String toString() {
@@ -30,6 +31,9 @@ public class Enum {
 		public static Token getEnum(String str) {
 			Token[] enumArray = Token.values();
 			for (Token enumStr : enumArray) {
+				if (enumStr.name == null) {
+					return null;
+				}
 				if (str.equals(enumStr.name.toString())) {
 					return enumStr;
 				}

@@ -2,6 +2,7 @@ package lisp;
 
 import java.util.ArrayList;
 
+import lisp.Enum.Label;
 import lisp.Enum.Token;
 
 public abstract class OtherNode extends Node {
@@ -9,9 +10,11 @@ public abstract class OtherNode extends Node {
 
 class DummyNode extends OtherNode {
 	private ArrayList<Node> childNode;
+	private int index;
 
 	public DummyNode() {
 		this.childNode = new ArrayList<Node>();
+		this.index = 0;
 	}
 
 	public boolean addNode(Node node) {
@@ -25,21 +28,20 @@ class DummyNode extends OtherNode {
 	}
 
 	public void makeCommand(CommandLine commandLine) {
-		for (int i = 0; i < this.childNode.size() - 1; i++) {
-			this.childNode.get(i).makeCommand(commandLine);
+		while (index < this.childNode.size()) {
+			this.childNode.get(index).makeCommand(commandLine);
+			index++;
 		}
-		commandLine.addCommand(new Command(Token.DUMMY));
+	}
+
+	public int getChildNodeCount() {
+		return this.childNode.size();
 	}
 }
 
 class IfNode extends OtherNode {
 	private Node boolNode;
 	private Node trueNode, falseNode;
-	private boolean needTheDummy;
-
-	public IfNode() {
-		this.needTheDummy = false;
-	}
 
 	public boolean addNode(Node node) {
 		if (this.boolNode == null) {
@@ -47,7 +49,6 @@ class IfNode extends OtherNode {
 			if (!(node == null)) {
 				node.setParentNode(this);
 			}
-			this.needTheDummy = true;
 			return true;
 		} else if (this.trueNode == null) {
 			this.trueNode = node;
@@ -66,24 +67,30 @@ class IfNode extends OtherNode {
 		}
 	}
 
-	public boolean needTheDummy() {
-		return this.needTheDummy;
-	}
-
 	public void makeCommand(CommandLine commandLine) {
 		this.boolNode.makeCommand(commandLine);
-		commandLine.addCommand(new Command(Token.IF));
+		commandLine.addCommand(new Command(Token.IF, Label.SOIF));
 		this.trueNode.makeCommand(commandLine);
+		commandLine.addCommand(new Command(Token.JUMP, Label.EOTRUE));
 		this.falseNode.makeCommand(commandLine);
+		commandLine.addCommand(new Command(Label.EOFALSE));
 	}
 }
 
 class FunctionNode extends OtherNode {
-	private Node dummyArgNode, substanceNode, actualArgNode;
+	private Node dummyArgNode, substanceNode;
+	private ArrayList<Node> actualArgNode;
+	private int maxArg;
 	private String key;
+	private boolean isSeted;
 
 	public FunctionNode(String key) {
 		this.key = key;
+		this.isSeted = false;
+		if (MapForFunction.existFunction(key)) {
+			this.actualArgNode = new ArrayList<Node>();
+			this.maxArg = MapForFunction.getFunction(key).getMaxArg();
+		}
 	}
 
 	public boolean addNode(Node node) {
@@ -95,19 +102,31 @@ class FunctionNode extends OtherNode {
 				}
 				return true;
 			} else if (this.substanceNode == null) {
+				if (this.dummyArgNode instanceof DummyNode) {
+					MapForFunction.getFunction(this.key)
+							.setMaxArg(
+									((DummyNode) this.dummyArgNode)
+											.getChildNodeCount());
+				} else {
+					MapForFunction.getFunction(this.key).setMaxArg(1);
+				}
 				this.substanceNode = node;
 				if (!(node == null)) {
 					node.setParentNode(this);
 				}
 				return true;
-			} else {
+			} else if (!this.isSeted) {
 				MapForFunction.getFunction(this.key).setCommandLine(
 						this.dummyArgNode, this.substanceNode);
+				this.isSeted = true;
 			}
 		} else {
-			if (this.actualArgNode == null) {
-				this.actualArgNode = node;
-				if (!(node == null)) {
+			if (this.actualArgNode.size() < this.maxArg) {
+				this.actualArgNode.add(node);
+
+				if (node == null) {
+					this.actualArgNode.remove(this.actualArgNode.size() - 1);
+				} else {
 					node.setParentNode(this);
 				}
 				return true;
@@ -121,7 +140,9 @@ class FunctionNode extends OtherNode {
 	}
 
 	public void makeCommand(CommandLine commandLine) {
-		this.actualArgNode.makeCommand(commandLine);
+		for (int i = 0; i < this.maxArg; i++) {
+			this.actualArgNode.get(i).makeCommand(commandLine);
+		}
 		commandLine.addCommand(new Command(this.key));
 	}
 }

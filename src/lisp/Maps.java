@@ -64,19 +64,29 @@ class MapForFunction {
 
 class FunctionBody {
 	private CommandLine commandLine;
+	private int maxArg;
 
 	public FunctionBody() {
 		this.commandLine = new CommandLine();
 	}
 
 	public void setCommandLine(Node dummyArgNode, Node substanceNode) {
+		commandLine.addCommand(new Command(Token.PUSHNULL));
 		dummyArgNode.makeCommand(this.commandLine);
 		commandLine.addCommand(new Command(Token.SETARG));
 		substanceNode.makeCommand(this.commandLine);
 		commandLine.addCommand(new Command(Token.RESETARG));
 	}
 
+	public void setMaxArg(int maxArg) {
+		this.maxArg = maxArg;
+	}
+
 	public CommandLine getCommandLine() {
 		return this.commandLine;
+	}
+
+	public int getMaxArg() {
+		return this.maxArg;
 	}
 }
