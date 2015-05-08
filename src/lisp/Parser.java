@@ -74,6 +74,10 @@ public class Parser {
 						break;
 					case SETQ:
 						this.tree.addAndMoveNode(new SetqNode());
+						this.index++;
+						this.currentToken = token.get(this.index);
+						this.tree.addNode(new VariableNode(this.currentToken,
+								true));
 						break;
 					case IF:
 						this.tree.addAndMoveNode(new IfNode());

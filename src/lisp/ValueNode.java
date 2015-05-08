@@ -19,13 +19,28 @@ class NumberNode extends ValueNode {
 
 class VariableNode extends ValueNode {
 	private String key;
+	private boolean isSet;
 
 	public VariableNode(String key) {
 		this.key = key;
+		this.isSet = false;
+	}
+
+	public VariableNode(String key, boolean isSet) {
+		this(key);
+		this.isSet = true;
 	}
 
 	public void makeCommand(CommandLine commandLine) {
-		commandLine.addCommand(new Command(this.key));
+		if (this.isSet) {
+			this.makeCommandKey(commandLine);
+		} else {
+			commandLine.addCommand(new Command(this.key));
+		}
+	}
+
+	public void makeCommandKey(CommandLine commandLine) {
+		commandLine.addCommand(new Command(this.key, true));
 	}
 }
 

@@ -12,12 +12,12 @@ public class Command {
 	private CommandLine commandLine;
 
 	public Command(double value) {
-		this.commandCode = Token.PUSH;
+		this.commandCode = Token.PUSHNUMBER;
 		this.value = new Value(value);
 	}
 
 	public Command(boolean value) {
-		this.commandCode = Token.PUSH;
+		this.commandCode = Token.PUSHBOOL;
 		this.value = new Value(value);
 	}
 
@@ -26,9 +26,14 @@ public class Command {
 			this.commandCode = Token.FUNCTION;
 			this.commandLine = MapForFunction.getFunction(key).getCommandLine();
 		} else {
-			this.commandCode = Token.PUSH;
+			this.commandCode = Token.PUSHNUMBER;
 			this.value = new Value(key);
 		}
+	}
+
+	public Command(String key, boolean isSet) {
+		this.commandCode = Token.PUSHKEY;
+		this.value = new Value(key);
 	}
 
 	public Command(Token commandCode) {

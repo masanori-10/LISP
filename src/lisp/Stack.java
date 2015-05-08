@@ -2,39 +2,95 @@ package lisp;
 
 import java.util.ArrayList;
 
+import lisp.Enum.Attribute;
+
 public class Stack {
-	private ArrayList<Value> stack;
+	private ArrayList<Double> value;
+	private ArrayList<Attribute> attribute;
+	private ArrayList<String> key;
 
 	public Stack() {
-		this.stack = new ArrayList<Value>();
+		this.value = new ArrayList<Double>();
+		this.attribute = new ArrayList<Attribute>();
+		this.key = new ArrayList<String>();
 	}
 
-	public void push(Value value) {
-		this.stack.add(value);
+	public void push(double value) {
+		this.value.add(value);
+		this.attribute.add(Attribute.NUMBER);
+		this.key.add(null);
 	}
 
-	public Value pop() {
-		Value ret;
-		ret = this.stack.get(this.stack.size() - 1);
-		this.stack.remove(this.stack.size() - 1);
-		return ret;
-	}
-
-	public Value pop2nd() {
-		Value ret;
-		ret = this.stack.get(this.stack.size() - 2);
-		this.stack.remove(this.stack.size() - 2);
-		return ret;
-	}
-
-	public Value getValue() {
-		Value ret;
-		if (this.stack.isEmpty()) {
-			return null;
+	public void push(boolean value) {
+		this.attribute.add(Attribute.BOOL);
+		this.key.add(null);
+		if (value) {
+			this.value.add(0.0);
+		} else {
+			this.value.add(1.0);
 		}
-		ret = this.stack.get(0);
-		this.stack.remove(0);
+	}
+
+	public void push(String key) {
+		this.key.add(key);
+		this.value.add(0.0);
+		this.attribute.add(Attribute.KEY);
+	}
+
+	public double pop() {
+		double ret;
+		ret = this.value.get(this.value.size() - 1);
+		this.value.remove(this.value.size() - 1);
+		this.attribute.remove(this.attribute.size() - 1);
+		this.key.remove(this.key.size() - 1);
 		return ret;
+	}
+
+	public double pop2nd() {
+		double ret;
+		ret = this.value.get(this.value.size() - 2);
+		this.value.remove(this.value.size() - 2);
+		this.attribute.remove(this.attribute.size() - 2);
+		this.key.remove(this.key.size() - 2);
+		return ret;
+	}
+
+	public String popKey() {
+		String ret;
+		ret = this.key.get(this.key.size() - 1);
+		this.value.remove(this.value.size() - 1);
+		this.attribute.remove(this.attribute.size() - 1);
+		this.key.remove(this.key.size() - 1);
+		return ret;
+	}
+
+	public String popKey2nd() {
+		String ret;
+		ret = this.key.get(this.key.size() - 2);
+		this.value.remove(this.value.size() - 2);
+		this.attribute.remove(this.attribute.size() - 2);
+		this.key.remove(this.key.size() - 2);
+		return ret;
+	}
+
+	public double getValue() {
+		double ret;
+		ret = this.value.get(0);
+		this.value.remove(0);
+		this.attribute.remove(0);
+		this.key.remove(0);
+		return ret;
+	}
+
+	public Attribute getAttribute() {
+		if (this.attribute.isEmpty()) {
+			return Attribute.NULL;
+		}
+		return this.attribute.get(0);
+	}
+
+	public Attribute readAttribute() {
+		return this.attribute.get(this.attribute.size() - 1);
 	}
 }
 
@@ -70,20 +126,12 @@ class Value {
 		return this.number;
 	}
 
-	public void setVariable(double value) {
-		if (MapForArgument.existArgument(this.key)) {
-			MapForArgument.getArgument(this.key).add(value);
-		}
-		MapForVariable.setVariable(this.key, value);
-	}
-
-	public void resetVariable() {
-		MapForArgument.getArgument(this.key).remove(
-				MapForArgument.getArgument(this.key).size() - 1);
-	}
-
 	public boolean getBool() {
 		return this.bool;
+	}
+
+	public String getKey() {
+		return this.key;
 	}
 
 	public boolean isNumber() {

@@ -5,11 +5,15 @@ public class Enum {
 		EOTRUE, EOFALSE, SOIF;
 	}
 
+	public enum Attribute {
+		NUMBER, BOOL, KEY, NULL;
+	}
+
 	public enum Token {
 		T("T"), NIL("Nil"), SETQ("setq"), IF("if"), DEFUN("defun"), PLUS("+"), MINUS(
 				"-"), MULT("*"), DIVIDE("/"), LESSEQUAL("<="), GREATEREQUAL(
 				">="), NOTEQUAL("!="), EQUAL("="), LESS("<"), GREATER(">"), OPEN(
-				"("), CLOSE(")"), PUSH, FUNCTION, SETARG, RESETARG, JUMP, PUSHNULL, EOF, LABEL;
+				"("), CLOSE(")"), PUSHNUMBER, PUSHBOOL, PUSHKEY, FUNCTION, SETARG, RESETARG, JUMP, PUSHNULL, EOF, LABEL;
 		private String name;
 
 		private Token() {

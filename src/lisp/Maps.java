@@ -72,7 +72,11 @@ class FunctionBody {
 
 	public void setCommandLine(Node dummyArgNode, Node substanceNode) {
 		commandLine.addCommand(new Command(Token.PUSHNULL));
-		dummyArgNode.makeCommand(this.commandLine);
+		if (dummyArgNode instanceof DummyNode) {
+			((DummyNode) dummyArgNode).makeCommandKey(this.commandLine);
+		} else {
+			((VariableNode) dummyArgNode).makeCommandKey(this.commandLine);
+		}
 		commandLine.addCommand(new Command(Token.SETARG));
 		substanceNode.makeCommand(this.commandLine);
 		commandLine.addCommand(new Command(Token.RESETARG));

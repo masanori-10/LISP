@@ -34,6 +34,14 @@ class DummyNode extends OtherNode {
 		}
 	}
 
+	public void makeCommandKey(CommandLine commandLine) {
+		while (index < this.childNode.size()) {
+			((VariableNode) this.childNode.get(index))
+					.makeCommandKey(commandLine);
+			index++;
+		}
+	}
+
 	public int getChildNodeCount() {
 		return this.childNode.size();
 	}
